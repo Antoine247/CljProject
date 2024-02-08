@@ -6,7 +6,8 @@
         com.github.seancorfield/honeysql {:mvn/version "2.5.1103"}
         aero/aero {:mvn/version "1.1.6"}
         com.zaxxer/HikariCP {:mvn/version "5.1.0"}
-        com.brunobonacci/mulog {:mvn/version "0.9.0"}}
+        com.brunobonacci/mulog {:mvn/version "0.9.0"}
+        cli-matic/cli-matic {:mvn/version "0.5.4"}}
  :aliases
  {:run-m {:main-opts ["-m" "antoine.scriptQuirurgico"]}
   :run-x {:ns-default antoine.scriptQuirurgico

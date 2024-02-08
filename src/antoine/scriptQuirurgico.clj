@@ -1,9 +1,8 @@
 (ns antoine.scriptQuirurgico
-  (:require [next.jdbc :as jdbc]
-            [next.jdbc.connection :as connection]
-            [aero.core :refer [read-config]]
-            [clojure.java.io :as io])
-  (:import (com.zaxxer.hikari HikariDataSource))
+  (:require [antoine.system :refer [configuracion]] 
+            [clojure.java.io :as io]
+            [antoine.servicios.conexiones :as conn]
+            [honey.sql :as sql]) 
   (:gen-class))
 
 (defn greet
@@ -12,26 +11,27 @@
   (println (str "Hello, " (or (:name data) "World") "!")))
 
 
-
-
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
   (greet {:name (first args)}))
 
-(comment 
-  (def rc (read-config (io/resource "config.edn")))
-  (def db {:dbtype "postgres" 
-           :dbname "desal" 
-           :user "postgres" 
-           :password "postgres" 
-           :host "10.200.0.90"
-           :port "5432"})
+(defn paciente-inicial
+  "devuelve numero de historia clinica de paciente de ambulatorio sin protocolo ni seguridad quirurgica"
+  []
+  (let [query (sql/format {:select [:tbc_guardia.Guar_HistClinica :tbc_guardia.Guar_FechaIngreso, :tbc_guardia.Guar_HoraIngreso],
+                           :from [[:tbc_guardia]]
+                           :left-join[[:tbc_seguqui_new][:and
+                                                              [:= :tbc_guardia.Guar_HistClinica :tbc_seguqui_new.SegHistClinica]
+                                                              [:= :tbc_guardia.Guar_FechaIngreso :tbc_seguqui_new.SegFechaCarga]
+                                                              [:= :tbc_guardia.Guar_HoraIngreso :tbc_seguqui_new.SegHoraCarga]]]
+                           :where[:and
+                                  [:= :tbc_guardia.Guar_Estado 1]
+                                  [:is :tbc_seguqui_new.SegHistClinica :null]
+                                  [:> :tbc_guardia.Guar_FechaIngreso 20220101]]})]
+    (conn/ejecutar-enunciado configuracion :asistencial query)))
 
-  (def ds (jdbc/get-datasource db)) 
-
-  (def dsr (jdbc/get-datasource (-> rc :db :asistencial)))
-  
-  (jdbc/execute! ds ["select * from fichaaneste_cab fc where fc.histcli_unico = 839094"])
-  (jdbc/execute! dsr ["select * from tbc_val_ciru where tbc_val_ciru.VcirHistClinica = 847020"])
-  )
+(let [query (sql/format {:select [:tbc_seguqui_new.SegFechaCarga, :tbc_seguqui_new.SegHoraCarga]
+                         :from  [:tbc_seguqui_new]
+                         :where [:= :tbc_seguqui_new.SegHistClinica 66843]})]
+  (conn/ejecutar-enunciado configuracion :asistencial query))
