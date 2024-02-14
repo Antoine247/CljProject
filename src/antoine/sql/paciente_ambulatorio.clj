@@ -10,18 +10,21 @@
   (+ 500000 (rand-int 300000)))
 
 (defn paciente-ambulatorio-aleatorio
-  "genera un numero random entre 500.000 y 800.000 y de ahi obtiene una historia"
-  []
-  (let [query (sql/format {:select [:tbc_guardia.Guar_HistClinica
-                                    :tbc_guardia.Guar_FechaIngreso
-                                    :tbc_guardia.Guar_HoraIngreso]
-                           :from [:tbc_guardia]
-                           :where [:= :tbc_guardia.Guar_HistClinica (histclirand)]})]
-    (if-let [q (conn/ejecutar-enunciado configuracion :asistencial query)]
-      q
-      (recur))))
+  "genera un numero random entre 500.000 y 800.000 y de ahi obtiene una historia, 
+   si se le pasa la historia clinica va a usar esa" 
+  ([](paciente-ambulatorio-aleatorio nil))
+  ([histcli]
+   (let [query (sql/format {:select [:tbc_guardia.Guar_HistClinica
+                                     :tbc_guardia.Guar_FechaIngreso
+                                     :tbc_guardia.Guar_HoraIngreso]
+                            :from [:tbc_guardia]
+                            :where [:= :tbc_guardia.Guar_HistClinica (if (nil? histcli) (histclirand) histcli)]})]
+     (if-let [q (conn/ejecutar-enunciado configuracion :asistencial query)]
+       q
+       (recur nil)))))
 
-(paciente-ambulatorio-aleatorio)
+(paciente-ambulatorio-aleatorio 758036)
+
 
 
 
