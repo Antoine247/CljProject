@@ -2,7 +2,10 @@
   (:require [antoine.system :refer [configuracion]] 
             [clojure.java.io :as io]
             [antoine.servicios.conexiones :as conn]
-            [honey.sql :as sql]) 
+            [honey.sql :as sql]
+            [antoine.sql.paciente_ambulatorio :as pac]
+            [antoine.sql.seguridad_quirurgica :as sqa]
+            [java-time.api :as jt]) 
   (:gen-class))
 
 (defn greet
@@ -16,22 +19,10 @@
   [& args]
   (greet {:name (first args)}))
 
-(defn paciente-inicial
-  "devuelve numero de historia clinica de paciente de ambulatorio sin protocolo ni seguridad quirurgica"
-  []
-  (let [query (sql/format {:select [:tbc_guardia.Guar_HistClinica :tbc_guardia.Guar_FechaIngreso, :tbc_guardia.Guar_HoraIngreso],
-                           :from [[:tbc_guardia]]
-                           :left-join[[:tbc_seguqui_new][:and
-                                                              [:= :tbc_guardia.Guar_HistClinica :tbc_seguqui_new.SegHistClinica]
-                                                              [:= :tbc_guardia.Guar_FechaIngreso :tbc_seguqui_new.SegFechaCarga]
-                                                              [:= :tbc_guardia.Guar_HoraIngreso :tbc_seguqui_new.SegHoraCarga]]]
-                           :where[:and
-                                  [:= :tbc_guardia.Guar_Estado 1]
-                                  [:is :tbc_seguqui_new.SegHistClinica :null]
-                                  [:> :tbc_guardia.Guar_FechaIngreso 20220101]]})]
-    (conn/ejecutar-enunciado configuracion :asistencial query)))
 
-(let [query (sql/format {:select [:tbc_seguqui_new.SegFechaCarga, :tbc_seguqui_new.SegHoraCarga]
-                         :from  [:tbc_seguqui_new]
-                         :where [:= :tbc_seguqui_new.SegHistClinica 66843]})]
-  (conn/ejecutar-enunciado configuracion :asistencial query))
+
+(comment
+  (sqa/borrar (pac/paciente-ambulatorio-aleatorio 758036))
+  (jt/format "Hmm" (jt/local-date-time 2024 02 02 04 06))
+  :ref
+  )

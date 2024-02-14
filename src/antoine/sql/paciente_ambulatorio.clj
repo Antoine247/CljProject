@@ -2,34 +2,61 @@
   "scripts que se encargan de generar un paciente de ambulatorio limpio"
   (:require [antoine.system :refer [configuracion]]
             [antoine.servicios.conexiones :as conn]
-            [honey.sql :as sql]))
+            [honey.sql :as sql]
+            [antoine.utils.utils :as utils]))
 
-(defn histclirand
-  "genera un numero random entre 500.000 y 800.000"
-  []
-  (+ 500000 (rand-int 300000)))
 
-(defn paciente-ambulatorio-aleatorio
+
+(defn limpiar-paciente
+  "modifica la historia clinica o una random para que este en su version inicial"
+  [{:keys [tbc_guardia/Guar_HistClinica tbc_guardia/Guar_FechaIngreso tbc_guardia/Guar_HoraIngreso] :as paciente}
+   mapa-valores]
+  {:pre [(map? mapa-valores)]}
+  (let [query (sql/format {:update :tbc_guardia
+                           :set mapa-valores
+                           :where [:and [:= :tbc_guardia.Guar_HistClinica Guar_HistClinica]
+                                   [:= :tbc_guardia.Guar_FechaIngreso Guar_FechaIngreso]
+                                   [:= :tbc_guardia.Guar_HoraIngreso Guar_HoraIngreso]]})
+        resultado (conn/ejecutar-enunciado configuracion :asistencial query)]
+    (if (nil? resultado) 
+      (print "ocurrio un error con el sql") 
+      paciente)))
+
+(defn- paciente-ambulatorio-aleatorio
   "genera un numero random entre 500.000 y 800.000 y de ahi obtiene una historia, 
-   si se le pasa la historia clinica va a usar esa" 
-  ([](paciente-ambulatorio-aleatorio nil))
+   si se le pasa la historia clinica va a usar esa"
+  ([] (paciente-ambulatorio-aleatorio nil))
   ([histcli]
+   {:pre [(or (int? histcli) (nil? histcli))]}
    (let [query (sql/format {:select [:tbc_guardia.Guar_HistClinica
                                      :tbc_guardia.Guar_FechaIngreso
                                      :tbc_guardia.Guar_HoraIngreso]
                             :from [:tbc_guardia]
-                            :where [:= :tbc_guardia.Guar_HistClinica (if (nil? histcli) (histclirand) histcli)]})]
+                            :where [:= :tbc_guardia.Guar_HistClinica (if (nil? histcli) (utils/histclirand) histcli)]})]
      (if-let [q (conn/ejecutar-enunciado configuracion :asistencial query)]
        q
        (recur nil)))))
 
-(paciente-ambulatorio-aleatorio 758036)
-
+(comment
+  (limpiar-paciente (paciente-ambulatorio-aleatorio 758036) {:Guar_Estado 1,
+                                                             :Guar_Estado1 1,
+                                                             :Guar_Estado3 1
+                                                             :Guar_Medico 0,
+                                                             :Guar_TipoMed 0,
+                                                             :Guar_FechaAlta 0,
+                                                             :Guar_HoraAlta 0,
+                                                             :Guar_EspMed 0,
+                                                             :Guar_HoraAtenc 0})
+  :ref)
 
 
 
 
 (comment
+
+  (+ 2 2)
+  (defn foo
+    ())
   (def prueba
     (paciente-ambulatorio-aleatorio))
 
@@ -38,7 +65,15 @@
   (let [{:keys [tbc_guardia/Guar_HistClinica tbc_guardia/Guar_FechaIngreso]} prueba]
     [Guar_HistClinica Guar_FechaIngreso])
   :ref)
-
+{:tbc_guardia.Guar_Estado 1,
+ :tbc_guardia.Guar_Estado1 1,
+ :tbc_guardia.Guar_Estado3 1
+ :tbc_guardia.GuarMedico :nil,
+ :tbc_guardia.Guar_TipoMed :nil,
+ :tbc_guardia.Guar_FechaAlta 0,
+ :tbc_guardia.Guar_HoraAlta 0,
+ :tbc_guardia.Guar_EspMed 0,
+ :tbc_guardia.Guar_HoraAtenc 0}
 
 
 (defn obtiene-historia

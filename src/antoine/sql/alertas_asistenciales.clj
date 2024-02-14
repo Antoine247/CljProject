@@ -1,19 +1,18 @@
 (ns antoine.sql.alertas_asistenciales
-  "queries que se encargan de modificar las alertas asistenciales del protocolo"
+  "queries que se encargan de modificar las alertas asistenciales"
   (:require [antoine.system :refer [configuracion]]
             [antoine.servicios.conexiones :as conn]
             [honey.sql :as sql]
-            [antoine.sql.paciente_ambulatorio :as pac]
             [antoine.utils.utils :as utils]))
 
-(defn limpiar-alertas
+(defn borrar
   "borra las alertas asistenciales asignadas a la historia clinica"
   [{:keys [tbc_guardia/Guar_HistClinica]}]
   (let [query (sql/format {:delete-from :tbc_alerta
                            :where [:= :tbc_alerta.Aler_HistClin Guar_HistClinica]})]
     (conn/ejecutar-enunciado configuracion :asistencial query)))
 
-(defn crear-alerta
+(defn crear
   "crea una alerta asistencial"
   [valores]
   {:pre [(or (utils/vector-doble? valores) (utils/vector-mapa? valores))]}
@@ -21,7 +20,7 @@
                            :values valores})]
     (conn/ejecutar-enunciado configuracion :asistencial query)))
 
-(defn actualizar-alerta
+(defn actualizar
   "actualiza alerta asistencial se debe enviar la historia clinica y un mapa con :columna valor"
   [histcli mapa-valores]
   {:pre [(map? mapa-valores) (int? histcli)]}
@@ -33,7 +32,7 @@
 
 (comment
   (def paciente)
-  (limpiar-alertas (pac/paciente-ambulatorio-aleatorio 758036))
+  (borrar-alerta 758036)
   
   (type (sql/format {:delete-from :tbc_alerta
                      :where [:= :tbc_alerta.Aler_HistClin 1]}))
