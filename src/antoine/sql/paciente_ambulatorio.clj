@@ -22,7 +22,7 @@
       (print "ocurrio un error con el sql") 
       paciente)))
 
-(defn- paciente-ambulatorio-aleatorio
+(defn paciente-ambulatorio-aleatorio
   "genera un numero random entre 500.000 y 800.000 y de ahi obtiene una historia, 
    si se le pasa la historia clinica va a usar esa"
   ([] (paciente-ambulatorio-aleatorio nil))
@@ -53,10 +53,8 @@
 
 
 (comment
-
-  (+ 2 2)
-  (defn foo
-    ())
+(+ 2 2)
+  (paciente-ambulatorio-aleatorio 758036)
   (def prueba
     (paciente-ambulatorio-aleatorio))
 
@@ -65,21 +63,6 @@
   (let [{:keys [tbc_guardia/Guar_HistClinica tbc_guardia/Guar_FechaIngreso]} prueba]
     [Guar_HistClinica Guar_FechaIngreso])
   :ref)
-{:tbc_guardia.Guar_Estado 1,
- :tbc_guardia.Guar_Estado1 1,
- :tbc_guardia.Guar_Estado3 1
- :tbc_guardia.GuarMedico :nil,
- :tbc_guardia.Guar_TipoMed :nil,
- :tbc_guardia.Guar_FechaAlta 0,
- :tbc_guardia.Guar_HoraAlta 0,
- :tbc_guardia.Guar_EspMed 0,
- :tbc_guardia.Guar_HoraAtenc 0}
-
-
-(defn obtiene-historia
-  "toma una historia de acuer")
-[histcli]
-()
 
 (comment
 

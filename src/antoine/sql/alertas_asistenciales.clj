@@ -21,7 +21,8 @@
     (conn/ejecutar-enunciado configuracion :asistencial query)))
 
 (defn actualizar
-  "actualiza alerta asistencial se debe enviar la historia clinica y un mapa con :columna valor"
+  "actualiza alerta asistencial se debe enviar la historia clinica y un mapa con :columna valor
+   nota: :columna debe ser solo el nombre de la columna"
   [histcli mapa-valores]
   {:pre [(map? mapa-valores) (int? histcli)]}
   (let [query (sql/format {:update :tbc_alerta
