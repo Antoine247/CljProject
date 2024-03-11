@@ -1,6 +1,5 @@
-(ns antoine.sql.anestesia_ambulatoria
-   (:require [antoine.system :refer [configuracion]]
-             [antoine.servicios.conexiones :as conn]
+(ns antoine.sql.anestesia-ambulatoria
+   (:require [antoine.servicios.conexiones :refer [consulta-asistencial]]
              [honey.sql :as sql]))
 
 (defn borrar
@@ -11,7 +10,7 @@
                                    [:= :tbc_anes_ambu.AnesHc Guar_HistClinica]
                                    [:= :tbc_anes_ambu.AnesFecIngreso Guar_FechaIngreso]
                                    [:= :tbc_anes_ambu.AnesHoraIngreso Guar_HoraIngreso]]})]
-    (conn/ejecutar-enunciado configuracion :asistencial query)))
+    (consulta-asistencial query)))
 
 (defn crear
   "crea una evaluacion preanestesica ambulatoria"
@@ -19,7 +18,7 @@
   {:pre [(or (utils/vector-doble? valores) (utils/vector-mapa? valores))]}
   (let [query (sql/format {:insert-into :tbc_anes_ambu
                            :values valores})]
-    (conn/ejecutar-enunciado configuracion :asistencial query)))
+    (consulta-asistencial query)))
 
 (defn actualizar
   "actualiza evaluacion preanestesica ambulatoria se envia mapa de paciente y mapa de valores a ingresar"
@@ -31,4 +30,4 @@
                                    [:= :tbc_anes_ambu.AnesHc Guar_HistClinica]
                                    [:= :tbc_anes_ambu.AnesFecIngreso Guar_FechaIngreso]
                                    [:= :tbc_anes_ambu.AnesHoraIngreso Guar_HoraIngreso]]})]
-    (conn/ejecutar-enunciado configuracion :asistencial query)))
+    (consulta-asistencial query)))

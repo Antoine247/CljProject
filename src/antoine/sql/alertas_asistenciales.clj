@@ -1,7 +1,6 @@
-(ns antoine.sql.alertas_asistenciales
+(ns antoine.sql.alertas-asistenciales
   "queries que se encargan de modificar las alertas asistenciales"
-  (:require [antoine.system :refer [configuracion]]
-            [antoine.servicios.conexiones :as conn]
+  (:require [antoine.servicios.conexiones :refer [consulta-asistencial]]
             [honey.sql :as sql]
             [antoine.utils.utils :as utils]))
 
@@ -10,7 +9,7 @@
   [{:keys [tbc_guardia/Guar_HistClinica]}]
   (let [query (sql/format {:delete-from :tbc_alerta
                            :where [:= :tbc_alerta.Aler_HistClin Guar_HistClinica]})]
-    (conn/ejecutar-enunciado configuracion :asistencial query)))
+    (consulta-asistencial query)))
 
 (defn crear
   "crea una alerta asistencial"
@@ -18,7 +17,7 @@
   {:pre [(or (utils/vector-doble? valores) (utils/vector-mapa? valores))]}
   (let [query (sql/format {:insert-into :tbc_alerta
                            :values valores})]
-    (conn/ejecutar-enunciado configuracion :asistencial query)))
+    (consulta-asistencial query)))
 
 (defn actualizar
   "actualiza alerta asistencial se debe enviar la historia clinica y un mapa con :columna valor
@@ -28,7 +27,7 @@
   (let [query (sql/format {:update :tbc_alerta
                            :set mapa-valores
                            :where [:= :tbc_alerta.Aler_HistClin histcli]})]
-    (conn/ejecutar-enunciado configuracion :asistencial query)))
+    (consulta-asistencial query)))
 
 
 (comment
