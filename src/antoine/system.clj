@@ -5,4 +5,12 @@
 
 (def configuracion (read-config (io/resource "config.edn")))
 
+(defn obtener-datasource
+  [tipo k]
+  (get-in configuracion [:db-type tipo k]))
 
+(comment 
+  (obtener-datasource :relativity :asistencial)
+  (obtener-datasource :relativity :maestros)
+  (obtener-datasource :postgres :desal)
+  )
