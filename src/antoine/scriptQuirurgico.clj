@@ -1,27 +1,72 @@
 (ns antoine.scriptQuirurgico
-  (:require [antoine.system :refer [configuracion]] 
-            [clojure.java.io :as io]
-            [antoine.servicios.conexiones :as conn]
-            [honey.sql :as sql] 
-            [java-time.api :as jt]) 
+  (:require [cli-matic.core :refer [run-cmd]]
+            [cli-matic.utils :as U])
   (:gen-class))
 
-(defn greet
-  "Callable entry point to the application."
-  [data]
-  (println (str "Hello, " (or (:name data) "World") "!")))
+(def CONFIGURATION
+  {:command "crea"
+   :description "Programa para introducir datos de prueba en aplicaciones Servoy en servicio para el Sanatorio Colegiales"
+   :version "0.0.1"
+   :opts [{:as "pacientes"
+           :default 1
+           :option "p"
+           :type :int}]
+   :subcommands [{:command "protocolo_internado"
+                  :description "Crea un protocolo internado completo o bien con los parámetros indicados por las opciones"
+                  :opts [{:as "Completo con anestesia"
+                          :option "ca"
+                          :type :flag}
+                         {:as "Completo sin anestesia"
+                          :option "csa"
+                          :type :flag}
+                         {:as "Seguridad Quirurgica Completa"
+                          :option "sqc"
+                          :type :flag}
+                         {:as "Seguridad Quirurgica antes incision"
+                          :option "sqi"
+                          :type :flag}
+                         {:as "Evaluacion anestesica preoperatoria"
+                          :option "eap"
+                          :type :flag}
+                         {:as "Ficha anestesica"
+                          :option "fa"
+                          :type :flag}
+                         {:as "Ficha anestesica sin cerrar"
+                          :option "fasc"
+                          :type :flag}
+                         {:as "Ficha anestesica sin medicamentos"
+                          :option "fasm"
+                          :type :flag}
+                         {:as "Medicamentos cirugia"
+                          :option "m"
+                          :type :flag}
+                         {:as "Con Evaluacion Post Anestesica"
+                          :option "cepa"
+                          :type :flag}
+                         {:as "Sin Evaluacion Post Anestesica"
+                          :option "sepa"
+                          :type :flag}
+                         {:as "Retiro de implante"
+                          :option "rim"
+                          :type :flag}
+                         {:as "Insercion de implante"
+                          :option "imp"
+                          :type :flag}]
+                  :runs prn}
+                 {:command "protocolo_ambulatorio"
+                  :description "Crea un protocolo ambulatorio completo o bien con los parámetros indicados por las opciones"
+                  :opts []
+                  :runs prn}]})
 
-
-(defn -main
-  "I don't do a whole lot ... yet."
+(defn -main 
   [& args]
-  (greet {:name (first args)}))
+  (run-cmd args CONFIGURATION))
 
 
 (comment
-  (sqa/borrar (pac/paciente-ambulatorio-aleatorio 758036))
-  (jt/format "Hmm" (jt/local-date-time 2024 02 02 04 06))
-  (hl/borrar (pac/paciente-ambulatorio-aleatorio 834619) 9999)
-  (reinicio-paciente 834619)
+  
+(let [ar (list "-ca" "2" "-sqc" "ald")] 
+  (run-cmd ar CONFIGURATION))
+
   :ref
   )
