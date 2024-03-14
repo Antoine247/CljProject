@@ -1,6 +1,7 @@
-(ns antoine.scriptQuirurgico
+(ns antoine.sanatorio
   (:require [cli-matic.core :refer [run-cmd]]
-            [cli-matic.utils :as U])
+            [cli-matic.utils :as U]
+            [antoine.comandos :refer [crear_protocolo_ambulatorio crear_protocolo_internado]])
   (:gen-class))
 
 (def CONFIGURATION
@@ -52,11 +53,11 @@
                          {:as "Insercion de implante"
                           :option "imp"
                           :type :flag}]
-                  :runs prn}
+                  :runs crear_protocolo_internado}
                  {:command "protocolo_ambulatorio"
                   :description "Crea un protocolo ambulatorio completo o bien con los parámetros indicados por las opciones"
                   :opts []
-                  :runs prn}]})
+                  :runs crear_protocolo_ambulatorio}]})
 
 (defn -main 
   [& args]

@@ -8,7 +8,8 @@
 (defn reinicio-paciente
   "llama a todas las funciones necesarias para borrar todos los registros de un paciente y poder usarlo desde 0
    puedes llamar la funcion sola y te va a usar un paciente random o puedes darle la historia clinica"
-  [histcli] (let [paciente (paciente/limpiar-paciente (paciente/paciente-ambulatorio-aleatorio histcli) {:Guar_Estado 1,
+  [histcli]
+  (let [paciente (paciente/limpiar-paciente (paciente/paciente-ambulatorio-aleatorio histcli) {:Guar_Estado 1,
                                                                                                :Guar_Estado1 1,
                                                                                                :Guar_Estado3 1
                                                                                                :Guar_Medico 0,
@@ -17,8 +18,8 @@
                                                                                                :Guar_HoraAlta 0,
                                                                                                :Guar_EspMed 0,
                                                                                                :Guar_HoraAtenc 0})]
-              (seguridad/borrar paciente)
-              (alerta/borrar paciente)
-              (lectora/borrar paciente 9999)
-              (anes-ambu/borrar paciente)
-              paciente))
+    (seguridad/borrar paciente)
+    (alerta/borrar paciente)
+    (lectora/borrar paciente 9999)
+    (anes-ambu/borrar paciente)
+    paciente))

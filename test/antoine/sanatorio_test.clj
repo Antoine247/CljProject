@@ -1,6 +1,6 @@
-(ns antoine.scriptQuirurgico-test
+(ns antoine.sanatorio-test
   (:require [clojure.test :refer :all]
-            [antoine.scriptQuirurgico :refer :all]))
+            [antoine.sanatorio :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."

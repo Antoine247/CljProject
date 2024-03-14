@@ -10,7 +10,7 @@
         cli-matic/cli-matic {:mvn/version "0.5.4"}
         clojure.java-time/clojure.java-time {:mvn/version "1.4.2"}}
  :aliases
- {:run-m {:main-opts ["-m" "antoine.scriptQuirurgico"]} 
+ {:run-m {:main-opts ["-m" "antoine.sanatorio"]} 
   :build {:deps {io.github.clojure/tools.build {:mvn/version "0.9.4"}}
           :ns-default build}
   :test {:extra-paths ["test"]
