@@ -1,29 +1,43 @@
 (ns antoine.eventos
-  (:require [antoine.sql.paciente_ambulatorio :as ambulatorio]
+  (:require [antoine.sql.paciente-ambulatorio :as ambulatorio]
             [antoine.sql.paciente-internado :as internado]
-            [antoine.sql.seguridad_quirurgica :as seguridad]
-            [antoine.sql.alertas_asistenciales :as alerta]
-            [antoine.sql.his_lectora :as lectora]
-            [antoine.sql.anestesia_ambulatoria :as anes-ambu]))
-
+            [antoine.sql.seguridad-quirurgica :as seguridad]
+            [antoine.sql.alertas-asistenciales :as alerta]
+            [antoine.sql.his-lectora :as lectora]
+            [antoine.sql.anestesia-ambulatoria :as anes-ambu]
+            [antoine.utils.utils :as utils]))
+ 
 (defn inicializar-paciente
   "Recibe una llave, :ambulatorio ó :internado"
   [tipo_paciente]
-  (let [paciente (if (= tipo_paciente :ambulatorio) 
-                   (-> (ambulatorio/paciente-ambulatorio-aleatorio)
-                       (ambulatorio/limpiar-paciente {:Guar_Estado 1,
-                                                      :Guar_Estado1 1,
-                                                      :Guar_Estado3 1
-                                                      :Guar_Medico 0,
-                                                      :Guar_TipoMed 0,
-                                                      :Guar_FechaAlta 0,
-                                                      :Guar_HoraAlta 0,
-                                                      :Guar_EspMed 0,
-                                                      :Guar_HoraAtenc 0})) 
-                   (-> (internado/paciente-internado-aleatorio)
-                       (internado/limpiar-paciente)))]
-    (-> paciente
-        seguridad/borrar
-        alerta/borrar
-        (lectora/borrar 9999)
-        anes-ambu/borrar)))
+  (if (= tipo_paciente :internado)
+    (let [paciente (internado/paciente-internado-aleatorio)] 
+      ((juxt seguridad/borrar alerta/borrar lectora/borrar anes-ambu/borrar) paciente)
+      paciente)
+    (let [paciente (ambulatorio/paciente-ambulatorio-aleatorio)
+          fecha (utils/fecha-actual)
+          hora (utils/hora-actual)
+          updated-registro (-> (update paciente :tbc_guardia/Guar_FechaIngreso (fn [_] fecha))
+                               (update :tbc_guardia/Guar_HoraIngreso (fn [_] hora)))
+          {:keys [next.jdbc/update-count]} (-> paciente
+                                               (ambulatorio/limpiar-paciente {:Guar_Estado 1,
+                                                                              :Guar_Estado1 1,
+                                                                              :Guar_Estado3 1
+                                                                              :Guar_Medico 0,
+                                                                              :Guar_TipoMed 0,
+                                                                              :Guar_FechaAlta 0,
+                                                                              :Guar_HoraAlta 0,
+                                                                              :Guar_EspMed 0,
+                                                                              :Guar_HoraAtenc 0
+                                                                              :Guar_FechaIngreso fecha
+                                                                              :Guar_HoraIngreso hora}))]  ;;Revisar qué valor debe tener adm_utiliza
+      (if (== update-count 1)
+        updated-registro
+        (throw (Exception. "Hubo un problema al actualizar el registro"))))))
+ 
+(comment
+   
+  (inicializar-paciente :ambulatorio)
+  (inicializar-paciente :internado)
+   
+  )

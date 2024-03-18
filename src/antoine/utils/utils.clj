@@ -11,13 +11,22 @@
 
 (defn fecha-actual
   []
-  (jt/format "yyyMMdd" (jt/local-date-time)))
+  (-> (jt/format "yyyMMdd" (jt/local-date-time))
+      Integer/parseInt))
 
 (defn hora-actual
   []
-  (jt/format "Hmm" (jt/local-date-time)))
+  (-> (jt/format "Hmm" (jt/local-date-time))
+      Integer/parseInt))
 
 (defn histclirand
   "genera un numero random entre 500.000 y 800.000"
   []
   (+ 500000 (rand-int 300000)))
+
+
+(comment
+
+   (fecha-actual)
+  (hora-actual) 
+  )

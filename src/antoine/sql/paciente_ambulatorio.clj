@@ -27,31 +27,16 @@
                                      :tbc_guardia.Guar_FechaIngreso
                                      :tbc_guardia.Guar_HoraIngreso]
                             :from [:tbc_guardia]
-                            :where [:= :tbc_guardia.Guar_HistClinica hc]})]
-     (if-let [q (consulta-asistencial query)]
+                            :where [:= :tbc_guardia.Guar_HistClinica hc]})
+         q (consulta-asistencial query)]
+     (if (map? q) 
        q
        (recur nil)))))
 
-(defn reinicio-paciente
-  "llama a todas las funciones necesarias para borrar todos los registros de un paciente y poder usarlo desde 0
-   puedes llamar la funcion sola y te va a usar un paciente random o puedes darle la historia clinica"
-  [histcli]
-  (let [paciente (paciente/limpiar-paciente (paciente/paciente-ambulatorio-aleatorio histcli) {:Guar_Estado 1,
-                                                                                               :Guar_Estado1 1,
-                                                                                               :Guar_Estado3 1
-                                                                                               :Guar_Medico 0,
-                                                                                               :Guar_TipoMed 0,
-                                                                                               :Guar_FechaAlta 0,
-                                                                                               :Guar_HoraAlta 0,
-                                                                                               :Guar_EspMed 0,
-                                                                                               :Guar_HoraAtenc 0})]
-    (seguridad/borrar paciente)
-    (alerta/borrar paciente)
-    (lectora/borrar paciente 9999)
-    (anes-ambu/borrar paciente)
-    paciente))
-
+ 
 (comment
+  (paciente-ambulatorio-aleatorio)
+
   (limpiar-paciente (paciente-ambulatorio-aleatorio 758036) {:Guar_Estado 1,
                                                              :Guar_Estado1 1,
                                                              :Guar_Estado3 1
@@ -61,43 +46,40 @@
                                                              :Guar_HoraAlta 0,
                                                              :Guar_EspMed 0,
                                                              :Guar_HoraAtenc 0})
+
+  (let [hc (utils/histclirand)
+        query (sql/format {:select [:tbc_guardia.Guar_HistClinica
+                                    :tbc_guardia.Guar_FechaIngreso
+                                    :tbc_guardia.Guar_HoraIngreso]
+                           :from [:tbc_guardia]
+                           :where [:= :tbc_guardia.Guar_HistClinica hc]})]
+    (println hc)
+    (consulta-asistencial query))
+  
+  (let [query (sql/format {:select [:tbc_guardia.Guar_HistClinica
+                                    :tbc_guardia.Guar_FechaIngreso
+                                    :tbc_guardia.Guar_HoraIngreso]
+                           :from [:tbc_guardia]})] 
+    (consulta-asistencial query))
+  
+  (let [query (sql/format {:update :tbc_guardia
+                           :set {:Guar_Estado 1,
+                                 :Guar_Estado1 1,
+                                 :Guar_Estado3 1
+                                 :Guar_Medico 0,
+                                 :Guar_TipoMed 0,
+                                 :Guar_FechaAlta 0,
+                                 :Guar_HoraAlta 0,
+                                 :Guar_EspMed 0,
+                                 :Guar_HoraAtenc 0
+                                 :Guar_FechaIngreso (utils/fecha-actual)
+                                 :Guar_HoraIngreso (utils/hora-actual)}
+                           :where [:and [:= :tbc_guardia.Guar_HistClinica 551540]
+                                   [:= :tbc_guardia.Guar_FechaIngreso 20160722]
+                                   [:= :tbc_guardia.Guar_HoraIngreso 1632]]})]
+    query
+    #_(consulta-asistencial query))
+  
+  (concat '([:tbc_guardia/Guar_HistClinica 558960M] [:tbc_guardia/Guar_FechaIngreso 20161107] [:tbc_guardia/Guar_HoraIngreso 1542]))
   :ref)
 
-
-
-
-(comment
-(+ 2 2)
-  (paciente-ambulatorio-aleatorio 758036)
-  (def prueba
-    (paciente-ambulatorio-aleatorio))
-
-  (get prueba :tbc_guardia/Guar_HistClinica)
-
-  (let [{:keys [tbc_guardia/Guar_HistClinica tbc_guardia/Guar_FechaIngreso]} prueba]
-    [Guar_HistClinica Guar_FechaIngreso])
-  :ref)
-
-(comment
-
-  (let [query (sql/format {:delete-from [:tbc_seguqui_new]
-                           :where [:= :tbc_seguqui_new.SegHistClinica 554227]})
-        query2 (sql/format {:delete-from [:tbc_anes_ambu]
-                            :where [:= :tbc_anes_ambu.AnesHc 554227]})]
-    #_(with-open  [conn (jdbc/get-connection (get-in  configuracion [:db :asistencial]))
-                   stmt (jdbc/prepare conn (concat query query2))]
-        stmt)
-    (conn/ejecutar-enunciado configuracion :asistencial nil query query2))
-
-  (with-open  [conn (jdbc/get-connection (get-in  configuracion [:db :asistencial]))
-               stmt (jdbc/prepare conn [["DELETE FROM tbc_seguqui_new WHERE tbc_seguqui_new.SegHistClinica = ?" "DELETE FROM tbc_anes_ambu WHERE tbc_anes_ambu.AnesHc = ?"]
-                                        [554227]])]
-    stmt)
-
-  (let [query (sql/format {:select [:*]
-                           :from [:tbc_seguqui_new]
-                           :where [:= :tbc_seguqui_new.SegHistClinica 554227]})]
-    (conn/ejecutar-enunciado configuracion :asistencial query))
-
-  ()
-  :ref)

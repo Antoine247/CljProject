@@ -6,9 +6,9 @@
 
 (defn borrar
   "borra las alertas asistenciales asignadas a la historia clinica"
-  [{:keys [tbc_guardia/Guar_HistClinica]}]
+  [{:keys [tbc_guardia/Guar_HistClinica tbc_admision_scroll/Adm_HistClin]}]
   (let [query (sql/format {:delete-from :tbc_alerta
-                           :where [:= :tbc_alerta.Aler_HistClin Guar_HistClinica]})]
+                           :where [:= :tbc_alerta.Aler_HistClin (or Guar_HistClinica Adm_HistClin)]})]
     (consulta-asistencial query)))
 
 (defn crear

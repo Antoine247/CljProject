@@ -5,12 +5,10 @@
 
 (defn borrar
   "borro contenido en his lectora dandole mapa de paciente con historia clinica y articulo a borrar, 9999 es la operacion"
-  [{:keys [tbc_guardia/Guar_HistClinica]} articulo]
+  [{:keys [tbc_guardia/Guar_HistClinica tbc_admision_scroll/Adm_HistClin]} articulo]
   {:pre[(int? articulo)]}
   (let [query (sql/format {:delete-from :tbc_his_lectora
-                           :where [:and
-                                   [:= :tbc_his_lectora.Hlec_HistClin Guar_HistClinica]
-                                   [:= :tbc_his_lectora.Hlec_Art articulo]]})]
+                           :where [:= :tbc_his_lectora.Hlec_HistClin (or Guar_HistClinica Adm_HistClin)]})]
     (consulta-asistencial query)))
 
 (defn crear
