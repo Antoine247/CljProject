@@ -24,6 +24,19 @@
   []
   (+ 500000 (rand-int 300000)))
 
+(defn remover-digito-verificador
+  [legajo]
+  (cond
+    (not (number? legajo)) 0
+    (== 0 legajo) legajo
+    (< legajo 10) legajo
+    :else (->> legajo
+               str
+               char-array
+               butlast
+               (apply str)
+               Long/parseLong)))
+
 
 (comment
 
