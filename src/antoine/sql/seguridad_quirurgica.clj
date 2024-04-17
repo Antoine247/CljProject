@@ -1,7 +1,7 @@
 (ns antoine.sql.seguridad-quirurgica
   "queries que se encargan de modificar la seguridad quirurgica ambulatoria"
   (:require [antoine.servicios.conexiones :refer [consulta-asistencial]]
-            [antoine.especificaciones.generadores :refer [generar-seguridad-quirugica-parcial generar-seguridad-quirurgica-completa]]
+            [antoine.especificaciones.generadores :refer [generar-seguridad-quirurgica]]
             [honey.sql :as sql]))
 
 (defn borrar
@@ -14,110 +14,96 @@
                                    [:= :tbc_seguqui_new.SegFechaCarga (or Guar_FechaIngreso Adm_FecIng)]
                                    [:= :tbc_seguqui_new.SegHoraCarga (or Guar_HoraIngreso Adm_HorIng)]]})]
     (consulta-asistencial query)))
-;; Creo que habría que agregar completa-con-anestesia y completa-sin-anestesica
+
 (defn insertar
-  [{:keys [tbc_admision_scroll/Adm_HistClin tbc_guardia/Guar_HistClinica tipo-solicitud]}] ;; tipo-solicitud tendrá como valor :completa o :parcial en indicará el tipo de inserción
+  "Recibe un mapa con HC y :tipo-solicitud (:completa-con-anestesia :completa-sin-anestesia :parcial-con-anestesia :parcial-sin-anestesia)"
+  [{:keys [tbc_admision_scroll/Adm_HistClin tbc_guardia/Guar_HistClinica tipo-solicitud]}] 
   (let [hc (or Adm_HistClin Guar_HistClinica)
         tipohc (if Adm_HistClin 0 1)
         valores (case tipo-solicitud
-                  :completa (concat [hc hc tipohc tipohc] (generar-seguridad-quirurgica-completa))
-                  :parcial (concat [hc hc tipohc tipohc] (generar-seguridad-quirugica-parcial))
+                  :completa-con-anestesia (concat [hc hc tipohc tipohc] (generar-seguridad-quirurgica :completa-con-anestesia))
+                  :completa-sin-anestesia (concat [hc hc tipohc tipohc] (generar-seguridad-quirurgica :completa-sin-anestesia))
+                  :parcial-con-anestesia (concat [hc hc tipohc tipohc] (generar-seguridad-quirurgica :parcial-con-anestesia))
+                  :parcial-sin-anestesia (concat [hc hc tipohc tipohc] (generar-seguridad-quirurgica :parcial-sin-anestesia))
                   (throw (IllegalArgumentException. "Opción inválida para generación de valores para seguridad quirúrgica")))
-        stmt (case tipo-solicitud
-               :completa (sql/format {:insert-into :tbc_seguqui_new
-                                      :columns [:seghistclinica
-                                                :seghistclinica1
-                                                :segtipohc
-                                                :segtipohc1
-                                                :segfechacarga
-                                                :seghoracarga
-                                                :segprotocolo
-                                                :segcirculmate
-                                                :segtipoadmin
-                                                :seglegaadmin
-                                                :segtipocirculini
-                                                :seglegacirculini
-                                                :seganestalergia
-                                                :segestado
-                                                :segadminident
-                                                :segadmindiag
-                                                :segadminconsen
-                                                :segcirculident
-                                                :segcirculbanio
-                                                :segcirculhiscli
-                                                :segcirculestu
-                                                :segcirculprote
-                                                :segcirculconsen
-                                                :seganestident
-                                                :seganestpulso
-                                                :seganestseguri
-                                                :seganestcuales
-                                                :seganestviaaerea
-                                                :seganestacceso
-                                                :seganestsangre
-                                                :seglegaanestini
-                                                :segtipoanestini
-                                                :segciruident
-                                                :segciruantibiot
-                                                :segcirubisturi
-                                                :segciruincidentes
-                                                :seglegaciruini
-                                                :segtipociruini
-                                                :seganestrepasaini
-                                                :seglegaanestrepi
-                                                :segtipoanestrepi
-                                                :seginstrurepasaini
-                                                :seginstrugasasini
-                                                :seginstrupinzasini
-                                                :seglegainstruini
-                                                :segtipoinstruini
-                                                :segciruproced
-                                                :segciruindica
-                                                :seglegacirufin
-                                                :segtipocirufin
-                                                :seganestplan
-                                                :seglegaanestfin
-                                                :segtipoanestfin
-                                                :seginstrugasasfin
-                                                :seginstrupinzasfin
-                                                :seglegainstrufin
-                                                :segtipoinstrufin
-                                                :segcirculmuestras
-                                                :segcirculregistro
-                                                :seglegacirculfin
-                                                :segtipocirculfin
-                                                :seganestocular
-                                                :seganestdecubi
-                                                :seganestcomorb
-                                                :segcirculproinstru
-                                                :segcirculnormot
-                                                :segcirculparteciru
-                                                :segcirculparteanes
-                                                :segcirculequipres
-                                                :segcirculequifunc
-                                                :segcirculidsipr
-                                                :segcirculdecubi
-                                                :segcirculimprev
-                                                :segcirculanesproblema
-                                                :seglegacirculcut
-                                                :segtipocirculcut]
-                                      :values [valores]})
-               :parcial (sql/format {:insert-into :tbc_seguqui_new
-                                     :columns [:seghistclinica
-                                               :seghistclinica1
-                                               :segtipohc
-                                               :segtipohc1
-                                               :segfechacarga
-                                               :seghoracarga
-                                               :segprotocolo
-                                               :segcirculmate
-                                               :segtipoadmin
-                                               :seglegaadmin
-                                               :segtipocirculini
-                                               :seglegacirculini
-                                               :seganestalergia]
-                                     :values [valores]})
-               (throw (IllegalArgumentException. "Opción inválida para inserción de registro en seguridad quirúrgica")))]
+        stmt (sql/format {:insert-into :tbc_seguqui_new
+                          :columns [:seghistclinica
+                                    :seghistclinica1
+                                    :segtipohc
+                                    :segtipohc1
+                                    :segfechacarga
+                                    :seghoracarga
+                                    :segprotocolo
+                                    :segcirculmate
+                                    :segtipoadmin
+                                    :seglegaadmin
+                                    :segtipocirculini
+                                    :seglegacirculini
+                                    :seganestalergia
+                                    :segestado
+                                    :segadminident
+                                    :segadmindiag
+                                    :segadminconsen
+                                    :segcirculident
+                                    :segcirculbanio
+                                    :segcirculhiscli
+                                    :segcirculestu
+                                    :segcirculprote
+                                    :segcirculconsen
+                                    :seganestident
+                                    :seganestpulso
+                                    :seganestseguri
+                                    :seganestcuales
+                                    :seganestviaaerea
+                                    :seganestacceso
+                                    :seganestsangre
+                                    :seglegaanestini
+                                    :segtipoanestini
+                                    :segciruident
+                                    :segciruantibiot
+                                    :segcirubisturi
+                                    :segciruincidentes
+                                    :seglegaciruini
+                                    :segtipociruini
+                                    :seganestrepasaini
+                                    :seglegaanestrepi
+                                    :segtipoanestrepi
+                                    :seginstrurepasaini
+                                    :seginstrugasasini
+                                    :seginstrupinzasini
+                                    :seglegainstruini
+                                    :segtipoinstruini
+                                    :segciruproced
+                                    :segciruindica
+                                    :seglegacirufin
+                                    :segtipocirufin
+                                    :seganestplan
+                                    :seglegaanestfin
+                                    :segtipoanestfin
+                                    :seginstrugasasfin
+                                    :seginstrupinzasfin
+                                    :seglegainstrufin
+                                    :segtipoinstrufin
+                                    :segcirculmuestras
+                                    :segcirculregistro
+                                    :seglegacirculfin
+                                    :segtipocirculfin
+                                    :seganestocular
+                                    :seganestdecubi
+                                    :seganestcomorb
+                                    :segcirculproinstru
+                                    :segcirculnormot
+                                    :segcirculparteciru
+                                    :segcirculparteanes
+                                    :segcirculequipres
+                                    :segcirculequifunc
+                                    :segcirculidsipr
+                                    :segcirculdecubi
+                                    :segcirculimprev
+                                    :segcirculanesproblema
+                                    :seglegacirculcut
+                                    :segtipocirculcut]
+                          :values [valores]})]
     (consulta-asistencial stmt)))
 
 
@@ -125,6 +111,13 @@
   (borrar #:tbc_guardia{:Guar_HistClinica 766499M, :Guar_FechaIngreso 20221004, :Guar_HoraIngreso 2050})
   (borrar #:tbc_admision_scroll{:Adm_HistClin 3192770M, :Adm_FecIng 20240308, :Adm_HorIng 1504}) 
  
-  (def pac (assoc #:tbc_admision_scroll{:Adm_HistClin 3194150M, :Adm_FecIng 20240313, :Adm_HorIng 2201} :tipo-solicitud :completa))
-  (insertar pac) 
+  (def pac1 (assoc #:tbc_guardia{:Guar_HistClinica 668439M, :Guar_FechaIngreso 20240417, :Guar_HoraIngreso 1155} :tipo-solicitud :completa-con-anestesia))
+  (def pac2 (assoc #:tbc_admision_scroll{:Adm_HistClin 3194150M, :Adm_FecIng 20240313, :Adm_HorIng 2201} :tipo-solicitud :completa-sin-anestesia))
+  (def pac3 (assoc #:tbc_guardia{:Guar_HistClinica 501677M, :Guar_FechaIngreso 20240417, :Guar_HoraIngreso 1200} :tipo-solicitud :parcial-con-anestesia))
+  (def pac4 (assoc #:tbc_admision_scroll{:Adm_HistClin 3194270M, :Adm_FecIng 20240314, :Adm_HorIng 935} :tipo-solicitud :parcial-sin-anestesia))
+  (insertar pac1)
+  (insertar pac2)
+  (insertar pac3) 
+  (insertar pac4)
+  
   )
