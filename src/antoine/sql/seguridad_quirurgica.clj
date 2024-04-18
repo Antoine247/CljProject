@@ -17,22 +17,23 @@
 
 (defn insertar
   "Recibe un mapa con HC y :tipo-solicitud (:completa-con-anestesia :completa-sin-anestesia :parcial-con-anestesia :parcial-sin-anestesia)"
-  [{:keys [tbc_admision_scroll/Adm_HistClin tbc_guardia/Guar_HistClinica tipo-solicitud]}] 
+  [{:keys [tbc_admision_scroll/Adm_HistClin tbc_guardia/Guar_HistClinica tbc_guardia/Guar_HoraIngreso tbc_admision_scroll/Adm_HorIng tipo-solicitud]}] 
   (let [hc (or Adm_HistClin Guar_HistClinica)
+        hora (or Adm_HorIng Guar_HoraIngreso)
         tipohc (if Adm_HistClin 0 1)
         valores (case tipo-solicitud
-                  :completa-con-anestesia (concat [hc hc tipohc tipohc] (generar-seguridad-quirurgica :completa-con-anestesia))
-                  :completa-sin-anestesia (concat [hc hc tipohc tipohc] (generar-seguridad-quirurgica :completa-sin-anestesia))
-                  :parcial-con-anestesia (concat [hc hc tipohc tipohc] (generar-seguridad-quirurgica :parcial-con-anestesia))
-                  :parcial-sin-anestesia (concat [hc hc tipohc tipohc] (generar-seguridad-quirurgica :parcial-sin-anestesia))
+                  :completa-con-anestesia (concat [hc hc tipohc tipohc hora] (generar-seguridad-quirurgica :completa-con-anestesia))
+                  :completa-sin-anestesia (concat [hc hc tipohc tipohc hora] (generar-seguridad-quirurgica :completa-sin-anestesia))
+                  :parcial-con-anestesia (concat [hc hc tipohc tipohc hora] (generar-seguridad-quirurgica :parcial-con-anestesia))
+                  :parcial-sin-anestesia (concat [hc hc tipohc tipohc hora] (generar-seguridad-quirurgica :parcial-sin-anestesia))
                   (throw (IllegalArgumentException. "Opción inválida para generación de valores para seguridad quirúrgica")))
         stmt (sql/format {:insert-into :tbc_seguqui_new
                           :columns [:seghistclinica
                                     :seghistclinica1
                                     :segtipohc
                                     :segtipohc1
-                                    :segfechacarga
                                     :seghoracarga
+                                    :segfechacarga 
                                     :segprotocolo
                                     :segcirculmate
                                     :segtipoadmin
@@ -110,11 +111,11 @@
 (comment 
   (borrar #:tbc_guardia{:Guar_HistClinica 766499M, :Guar_FechaIngreso 20221004, :Guar_HoraIngreso 2050})
   (borrar #:tbc_admision_scroll{:Adm_HistClin 3192770M, :Adm_FecIng 20240308, :Adm_HorIng 1504}) 
- 
-  (def pac1 (assoc #:tbc_guardia{:Guar_HistClinica 668439M, :Guar_FechaIngreso 20240417, :Guar_HoraIngreso 1155} :tipo-solicitud :completa-con-anestesia))
-  (def pac2 (assoc #:tbc_admision_scroll{:Adm_HistClin 3194150M, :Adm_FecIng 20240313, :Adm_HorIng 2201} :tipo-solicitud :completa-sin-anestesia))
-  (def pac3 (assoc #:tbc_guardia{:Guar_HistClinica 501677M, :Guar_FechaIngreso 20240417, :Guar_HoraIngreso 1200} :tipo-solicitud :parcial-con-anestesia))
-  (def pac4 (assoc #:tbc_admision_scroll{:Adm_HistClin 3194270M, :Adm_FecIng 20240314, :Adm_HorIng 935} :tipo-solicitud :parcial-sin-anestesia))
+  
+  (def pac1 (assoc #:tbc_guardia {:Guar_HistClinica 509192M, :Guar_FechaIngreso 20240418, :Guar_HoraIngreso 1115} :tipo-solicitud :completa-con-anestesia))
+  (def pac2 (assoc #:tbc_admision_scroll{:Adm_HistClin 3196850M, :Adm_FecIng 20240322, :Adm_HorIng 1830} :tipo-solicitud :completa-sin-anestesia))
+  (def pac3 (assoc #:tbc_guardia{:Guar_HistClinica 736800M, :Guar_FechaIngreso 20240418, :Guar_HoraIngreso 1115} :tipo-solicitud :parcial-con-anestesia))
+  (def pac4 (assoc #:tbc_admision_scroll{:Adm_HistClin 3201230M, :Adm_FecIng 20240408, :Adm_HorIng 1425} :tipo-solicitud :parcial-sin-anestesia))
   (insertar pac1)
   (insertar pac2)
   (insertar pac3) 

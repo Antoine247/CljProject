@@ -39,7 +39,7 @@
         (throw (Exception. "Hubo un problema al actualizar el registro"))))))
  
 (comment
-   
+    
   (inicializar-paciente :ambulatorio)
   (inicializar-paciente :internado)
    

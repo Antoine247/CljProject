@@ -828,8 +828,7 @@
         circulante (legajo-sin-digito-verificador legajos-personal)
         anestesiologo (legajo-sin-digito-verificador legajo-anestesiologo)
         cirujano (legajo-sin-digito-verificador legajo-medico)]
-    [(fecha-actual)                                                     ; :segfechacarga 
-     (hora-actual)                                                      ; :seghoracarga
+    [(fecha-actual)                                                     ; :segfechacarga  
      0                                                                  ; :segprotocolo
      1                                                                  ; :segcirculmate
      0                                                                  ; :segtipoadmin 
@@ -907,8 +906,7 @@
   (let [admin (legajo-sin-digito-verificador legajos-personal)
         circulante (legajo-sin-digito-verificador legajos-personal) 
         cirujano (legajo-sin-digito-verificador legajo-medico)]
-    [(fecha-actual)                                                     ; :segfechacarga 
-     (hora-actual)                                                      ; :seghoracarga
+    [(fecha-actual)                                                     ; :segfechacarga  
      0                                                                  ; :segprotocolo
      2                                                                  ; :segcirculmate
      0                                                                  ; :segtipoadmin 
@@ -987,8 +985,7 @@
         circulante (legajo-sin-digito-verificador legajos-personal)
         anestesiologo (legajo-sin-digito-verificador legajo-anestesiologo)
         cirujano (legajo-sin-digito-verificador legajo-medico)]
-    [(fecha-actual)                                                     ; :segfechacarga 
-     (hora-actual)                                                      ; :seghoracarga
+    [(fecha-actual)                                                     ; :segfechacarga  
      0                                                                  ; :segprotocolo
      1                                                                  ; :segcirculmate
      0                                                                  ; :segtipoadmin 
@@ -1066,8 +1063,7 @@
   (let [admin (legajo-sin-digito-verificador legajos-personal)
         circulante (legajo-sin-digito-verificador legajos-personal) 
         cirujano (legajo-sin-digito-verificador legajo-medico)]
-    [(fecha-actual)                                                     ; :segfechacarga 
-     (hora-actual)                                                      ; :seghoracarga
+    [(fecha-actual)                                                     ; :segfechacarga  
      0                                                                  ; :segprotocolo
      1                                                                  ; :segcirculmate
      0                                                                  ; :segtipoadmin 
