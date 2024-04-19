@@ -13,7 +13,7 @@
                                    [:= :tbc_anes_ambu.AnesHoraIngreso  Guar_HoraIngreso]]})]
     (consulta-asistencial query)))
 
-(defn crear
+(defn insertar
   "crea una evaluacion preanestesica ambulatoria"
   [valores]
   {:pre [(or (utils/vector-doble? valores) (utils/vector-mapa? valores))]}

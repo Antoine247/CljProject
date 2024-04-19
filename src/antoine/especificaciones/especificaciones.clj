@@ -4,7 +4,7 @@
 
 (spec/def :seguridad/material-entregable (spec/int-in 1 3))
 (spec/def :seguridad/alergia-anestesia (spec/int-in 1 3))
-
+(spec/def :evaluacion-medica/presion-arterial (spec/int-in 20 300))
 
 (tests
  (spec/valid? :seguridad/material-entregable 4) := false
