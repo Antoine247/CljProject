@@ -37,9 +37,18 @@
                (apply str)
                Long/parseLong)))
 
+(defn plus-n-mins
+  [mins]
+  (as-> (jt/local-date-time) h
+      (.plusMinutes h mins)
+      (jt/format "Hmm" h) 
+      (Integer/parseInt h)))
+
 
 (comment
 
    (fecha-actual)
   (hora-actual) 
+
+  (plus-n-mins 40)
   )

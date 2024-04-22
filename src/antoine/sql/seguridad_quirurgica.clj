@@ -17,7 +17,7 @@
 
 (defn insertar
   "Recibe un mapa con HC y :tipo-solicitud (:completa-con-anestesia :completa-sin-anestesia :parcial-con-anestesia :parcial-sin-anestesia)"
-  [{:keys [tbc_admision_scroll/Adm_HistClin tbc_guardia/Guar_HistClinica tbc_guardia/Guar_HoraIngreso tbc_admision_scroll/Adm_HorIng tipo-solicitud]}] 
+  [{:keys [tbc_admision_scroll/Adm_HistClin tbc_guardia/Guar_HistClinica tbc_guardia/Guar_HoraIngreso tbc_admision_scroll/Adm_HorIng tipo-solicitud] :as pac}] 
   (let [hc (or Adm_HistClin Guar_HistClinica)
         hora (or Adm_HorIng Guar_HoraIngreso)
         tipohc (if Adm_HistClin 0 1)
@@ -105,7 +105,8 @@
                                     :seglegacirculcut
                                     :segtipocirculcut]
                           :values [valores]})]
-    (consulta-asistencial stmt)))
+    (when (consulta-asistencial stmt)
+      pac)))
 
 
 (comment 
