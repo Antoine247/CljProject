@@ -71,5 +71,5 @@
 (comment
   
   (crear_protocolo_internado {:cepa true})
-  
+    
   )

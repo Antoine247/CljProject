@@ -1313,8 +1313,8 @@
 
 (defn generar-evaluacion-anestesica-completa
   []
-  [1                                                       ;:anes_estado
-   0                                                       ;:anes_numero
+  [1                                                       ;:anes_estado ¿Cerrar o no cerrar? 2 es cerrado
+   0                                                       ;:anes_numero Si se cierra hay que agregar número acá
    (generar-nro-protocolo)                                 ;:anes_protocolo
    (legajo-sin-digito-verificador legajo-anestesiologo)    ;:anes_codlegamed
    0                                                       ;:anes_tiplegamed
@@ -1517,7 +1517,8 @@
    ;:ciripasorend
    ;:ciriusolaserargon
    ;:ciriusomicroscopio
-   ;:ciriusolaparascopio])
+   ;:ciriusolaparascopio
+   ])
 
 (defn generar-protocolo-internado-con-implantes
   []
@@ -1540,7 +1541,7 @@
    ;:ciripinzasinicio
    ;:cirifechainicio
    ;:cirihorainicio
-   ;:ciriestado
+   1;:ciriestado
    ;:ciriconsenti
    ;:ciriserieprot
    ;:cirimarcaprot
@@ -1565,7 +1566,8 @@
    ;:ciripasorend
    ;:ciriusolaserargon
    ;:ciriusomicroscopio
-   ;:ciriusolaparascopio])
+   ;:ciriusolaparascopio
+   ])
 
 (defn generar-protocolo-internado-extraccion-implantes
   []
@@ -1588,7 +1590,7 @@
    ;:ciripinzasinicio
    ;:cirifechainicio
    ;:cirihorainicio
-   ;:ciriestado
+   1;:ciriestado
    ;:ciriconsenti
    ;:ciriserieprot
    ;:cirimarcaprot
@@ -1613,7 +1615,8 @@
    ;:ciripasorend
    ;:ciriusolaserargon
    ;:ciriusomicroscopio
-   ;:ciriusolaparascopio])
+   ;:ciriusolaparascopio
+   ])
 
 (defn generar-protocolo-internado-anatomia-patologica
   []
@@ -1631,12 +1634,12 @@
    ;:ciriieciru
    ;:cirilegciru
    ;:cirinroquirofa
-   ;:cirifechafinal
-   ;:cirihorafinal
+   (fecha-actual);:cirifechafinal
+   (plus-n-mins 120);:cirihorafinal
    ;:ciripinzasinicio
-   ;:cirifechainicio
-   ;:cirihorainicio
-   ;:ciriestado
+   (fecha-actual);:cirifechainicio
+   (hora-actual);:cirihorainicio
+   1;:ciriestado
    ;:ciriconsenti
    ;:ciriserieprot
    ;:cirimarcaprot
@@ -1661,7 +1664,8 @@
    ;:ciripasorend
    ;:ciriusolaserargon
    ;:ciriusomicroscopio
-   ;:ciriusolaparascopio])
+   ;:ciriusolaparascopio
+   ])
  
 (comment
   (gen/generate (spec/gen :seguridad/material-entregable))
