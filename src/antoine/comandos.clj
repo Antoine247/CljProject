@@ -68,8 +68,9 @@
      hem -> Hemodinamia"
   [{:keys [aler ca csa sqc sqi eap fa fasc fasm m hci cepa sepa rim imp hem]}])
 
-(comment
-  
+(comment 
+   
   (crear_protocolo_internado {:cepa true})
+  (crear_protocolo_internado {:sqca true})
     
   )

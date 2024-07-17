@@ -993,8 +993,8 @@
      2                                                                  ; :segcirculdecubi
      2                                                                  ; :segcirculimprev
      2                                                                  ; :segcirculanesproblema
-     circulante                                                         ; seglegacirculcut
-     0                                                                  ; segtipocirculcut
+     circulante                                                         ; :seglegacirculcut
+     0                                                                  ; :segtipocirculcut
      ]))
 
 (defmethod generar-seguridad-quirurgica :completa-con-anestesia
