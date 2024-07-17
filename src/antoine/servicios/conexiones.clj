@@ -43,6 +43,12 @@
                                        :mensaje mensaje
                                        :fecha (LocalDateTime/now))))))))
 
+(defmacro con-transaccion-postgres
+  "Recibe una llave indicando la base postgres en la que crear la transacción y uno o más vectores de operaciones SQL que ejecutar en la transacción"
+  [k & cuerpo]
+  `(jdbc/with-transaction [tx# (obtener-datasource :postgres ~k)]
+    (map (fn [v] (jdbc/execute! tx# v)) ~cuerpo)))
+
 (def consulta-desal (obtener-conexion-postgres :desal))
 
 (def consulta-bases-auxiliares (obtener-conexion-postgres :bases_auxiliares))
@@ -55,22 +61,32 @@
 
 (def consulta-maestros-todo (obtener-conexion-relativity :maestros true))
 
+(def consulta-parametros (obtener-conexion-postgres :parametros))
+
 
 (comment
   (ns-unmap *ns* 'ejecutar-enunciado)
-   
+
   (consulta-asistencial ["SELECT * FROM tbc_his_lectora WHERE hlec_protocolo = 109862"])
- 
+
   (consulta-asistencial ["SELECT * FROM tbc_admision_scroll"])
- 
+
   (consulta-bases-auxiliares ["SELECT * FROM tbl_eventlog_cirugia"])
- 
+
   (consulta-desal ["SELECT * FROM fichaaneste_cab LIMIT 10"])
 
   (consulta-maestros ["SELECT * FROM tbc_articulos"])
 
   (consulta-maestros ["SELECT * FROM tbc_analisis"])
 
-  :ref
-  )
+  (consulta-parametros ["SELECT * FROM param"])
+ 
+  (macroexpand-1 (con-transaccion-postgres :parametros ["SELECT * FROM param"] ["SELECT * FROM param"] ["SELECT * FROM param"]))
+   
+  (jdbc/with-transaction [tx (obtener-datasource :postgres :parametros)]
+    (apply (partial jdbc/execute! tx) ["SELECT * FROM param"] ["SELECT * FROM param"] ["SELECT * FROM param"]))
+    
+   
+  
+  :ref)
 
