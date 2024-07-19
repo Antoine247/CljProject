@@ -5,7 +5,7 @@
             [antoine.sql.alertas-asistenciales :as alerta]
             [antoine.sql.his-lectora :as lectora]
             [antoine.sql.anestesia-internado :as anes]
-            [antoine.especificaciones.generadores :refer [generar-intervencion]]
+            [antoine.especificaciones.generadores-utils :refer [generar-intervencion]]
             [antoine.utils.utils :as utils]))
  
 (defn inicializar-paciente

@@ -22,8 +22,7 @@
         circulante (legajo-sin-digito-verificador legajos-personal)
         anestesiologo (legajo-sin-digito-verificador legajo-anestesiologo)
         cirujano (legajo-sin-digito-verificador legajo-medico)]
-    [(fecha-actual)                                                     ; :segfechacarga  
-     0                                                                  ; :segprotocolo
+    [(fecha-actual)                                                     ; :segfechacarga   
      1                                                                  ; :segcirculmate
      0                                                                  ; :segtipoadmin 
      admin                                                              ; :seglegaadmin
@@ -100,8 +99,7 @@
   (let [admin (legajo-sin-digito-verificador legajos-personal)
         circulante (legajo-sin-digito-verificador legajos-personal) 
         cirujano (legajo-sin-digito-verificador legajo-medico)]
-    [(fecha-actual)                                                     ; :segfechacarga  
-     0                                                                  ; :segprotocolo
+    [(fecha-actual)                                                     ; :segfechacarga   
      2                                                                  ; :segcirculmate
      0                                                                  ; :segtipoadmin 
      admin                                                              ; :seglegaadmin
@@ -179,8 +177,7 @@
         circulante (legajo-sin-digito-verificador legajos-personal)
         anestesiologo (legajo-sin-digito-verificador legajo-anestesiologo)
         cirujano (legajo-sin-digito-verificador legajo-medico)]
-    [(fecha-actual)                                                     ; :segfechacarga  
-     0                                                                  ; :segprotocolo
+    [(fecha-actual)                                                     ; :segfechacarga   
      1                                                                  ; :segcirculmate
      0                                                                  ; :segtipoadmin 
      admin                                                              ; :seglegaadmin
@@ -257,8 +254,7 @@
   (let [admin (legajo-sin-digito-verificador legajos-personal)
         circulante (legajo-sin-digito-verificador legajos-personal) 
         cirujano (legajo-sin-digito-verificador legajo-medico)]
-    [(fecha-actual)                                                     ; :segfechacarga  
-     0                                                                  ; :segprotocolo
+    [(fecha-actual)                                                     ; :segfechacarga   
      1                                                                  ; :segcirculmate
      0                                                                  ; :segtipoadmin 
      admin                                                              ; :seglegaadmin
@@ -334,7 +330,6 @@
   []
   [0                                                               ;:anes_estado
    0                                                               ;:anes_numero
-   0                                                               ;:anes_protocolo
    (legajo-sin-digito-verificador legajo-anestesiologo)            ;:anes_codlegamed
    0                                                               ;:anes_tiplegamed
    (generar-intervencion)                                          ;:anes_interven
@@ -490,8 +485,7 @@
 (defn generar-evaluacion-anestesica-completa
   []
   [1                                                       ;:anes_estado ¿Cerrar o no cerrar? 2 es cerrado
-   0                                                       ;:anes_numero Si se cierra hay que agregar número acá
-   (generar-nro-protocolo)                                 ;:anes_protocolo
+   0                                                       ;:anes_numero Si se cierra hay que agregar número acá 
    (legajo-sin-digito-verificador legajo-anestesiologo)    ;:anes_codlegamed
    0                                                       ;:anes_tiplegamed
    (generar-intervencion)                                  ;:anes_interven

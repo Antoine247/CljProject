@@ -15,7 +15,7 @@
 (defn insertar
   "Las opciones serían :hemodinamia, :parto o nil, el status :inicializada :completa :completa-con-implantes :completa-con-extraccion-implante 
    :completa-con-anatomia-patologica y anestesia? un booleano"
-  [{:keys [tbc_admision_scroll/Adm_HistClin tbc_admision_scroll/Adm_FecIng tbc_admision_scroll/Adm_HorIng opciones status anestesia?] :as pac}]
+  [{:keys [tbc_admision_scroll/Adm_HistClin tbc_admision_scroll/Adm_FecIng tbc_admision_scroll/Adm_HorIng protocolo opciones status anestesia?] :as pac}]
   (let [{:keys [tipointerven parto_ intervencion neonatologo partero]} (cond
                                                                  (= opciones :hemodinamia) {:tipointerven 2
                                                                                             :intervencion (generar-intervencion)
@@ -39,8 +39,7 @@
                         (= status :completa-con-implantes) generar-protocolo-internado-con-implantes
                         (= status :completa-con-extraccion-implante) generar-protocolo-internado-extraccion-implantes
                         (= status :completa-con-anatomia-patologica) generar-protocolo-internado-anatomia-patologica
-                        :else (throw (IllegalArgumentException. "Opción inválida")))
-        protocolo (numeradores/obtener-nro-protocolo)
+                        :else (throw (IllegalArgumentException. "Opción inválida"))) 
         valores (concat
                  [Adm_HistClin
                   Adm_FecIng

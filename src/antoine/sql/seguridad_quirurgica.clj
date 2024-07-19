@@ -2,6 +2,7 @@
   "queries que se encargan de modificar la seguridad quirurgica ambulatoria"
   (:require [antoine.servicios.conexiones :refer [consulta-asistencial]]
             [antoine.especificaciones.generadores :refer [generar-seguridad-quirurgica]]
+            [antoine.sql.numeradores :refer [obtener-nro-protocolo]]
             [honey.sql :as sql]))
 
 (defn borrar
@@ -16,16 +17,18 @@
     (consulta-asistencial query)))
 
 (defn insertar
-  "Recibe un mapa con HC y :tipo-solicitud (:completa-con-anestesia :completa-sin-anestesia :parcial-con-anestesia :parcial-sin-anestesia)"
+  "Recibe un mapa con HC y :tipo-solicitud (:completa-con-anestesia :completa-sin-anestesia :parcial-con-anestesia :parcial-sin-anestesia)
+   Devuelve un mapa `paciente` tal como el input añadiéndole el nro de protocolo"
   [{:keys [tbc_admision_scroll/Adm_HistClin tbc_guardia/Guar_HistClinica tbc_guardia/Guar_HoraIngreso tbc_admision_scroll/Adm_HorIng tipo-solicitud] :as pac}] 
   (let [hc (or Adm_HistClin Guar_HistClinica)
         hora (or Adm_HorIng Guar_HoraIngreso)
         tipohc (if Adm_HistClin 0 1)
+        protocolo (obtener-nro-protocolo)
         valores (case tipo-solicitud
-                  :completa-con-anestesia (concat [hc hc tipohc tipohc hora] (generar-seguridad-quirurgica :completa-con-anestesia))
-                  :completa-sin-anestesia (concat [hc hc tipohc tipohc hora] (generar-seguridad-quirurgica :completa-sin-anestesia))
-                  :parcial-con-anestesia (concat [hc hc tipohc tipohc hora] (generar-seguridad-quirurgica :parcial-con-anestesia))
-                  :parcial-sin-anestesia (concat [hc hc tipohc tipohc hora] (generar-seguridad-quirurgica :parcial-sin-anestesia))
+                  :completa-con-anestesia (concat [hc hc tipohc tipohc hora protocolo] (generar-seguridad-quirurgica :completa-con-anestesia))
+                  :completa-sin-anestesia (concat [hc hc tipohc tipohc hora protocolo] (generar-seguridad-quirurgica :completa-sin-anestesia))
+                  :parcial-con-anestesia (concat [hc hc tipohc tipohc hora protocolo] (generar-seguridad-quirurgica :parcial-con-anestesia))
+                  :parcial-sin-anestesia (concat [hc hc tipohc tipohc hora protocolo] (generar-seguridad-quirurgica :parcial-sin-anestesia))
                   (throw (IllegalArgumentException. "Opción inválida para generación de valores para seguridad quirúrgica")))
         stmt (sql/format {:insert-into :tbc_seguqui_new
                           :columns [:seghistclinica
@@ -33,8 +36,8 @@
                                     :segtipohc
                                     :segtipohc1
                                     :seghoracarga
-                                    :segfechacarga 
                                     :segprotocolo
+                                    :segfechacarga 
                                     :segcirculmate
                                     :segtipoadmin
                                     :seglegaadmin
@@ -106,7 +109,7 @@
                                     :segtipocirculcut]
                           :values [valores]})]
     (when (consulta-asistencial stmt)
-      pac)))
+      (assoc pac :protocolo protocolo))))
 
 
 (comment 

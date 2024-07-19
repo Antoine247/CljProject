@@ -12,19 +12,19 @@
 
 (defn insertar
   "`tipo-insercion`contempla las siguientes llaves => :preanestesica y :completa (pre y post-anestesica)"
-  [{:keys [tbc_admision_scroll/Adm_HistClin tbc_admision_scroll/Adm_FecIng tbc_admision_scroll/Adm_HorIng tipo-insercion] :as pac}]
+  [{:keys [tbc_admision_scroll/Adm_HistClin tbc_admision_scroll/Adm_FecIng tbc_admision_scroll/Adm_HorIng protocolo tipo-insercion] :as pac}]
   (let [fn-generacion (case tipo-insercion
                         :preanestesica generar-evaluacion-preanestesica
                         :completa generar-evaluacion-anestesica-completa
                         (throw (IllegalArgumentException. "Opción no implementada")))
-        valores (concat [Adm_HistClin Adm_FecIng Adm_HorIng] (fn-generacion))
+        valores (concat [Adm_HistClin Adm_FecIng Adm_HorIng protocolo] (fn-generacion))
         query (sql/format {:insert-into :tbc_anestesia
                            :columns [:anes_histclin
                                      :anes_feccarga
                                      :anes_horcarga
-                                     :anes_estado
-                                     :anes_numero
                                      :anes_protocolo
+                                     :anes_estado
+                                     :anes_numero 
                                      :anes_codlegamed
                                      :anes_tiplegamed
                                      :anes_interven
