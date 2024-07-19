@@ -42,13 +42,16 @@
                                 (u/log ::excepcion-en-consulta-postgres
                                        :mensaje mensaje
                                        :fecha (LocalDateTime/now))))))))
-
+  
 (defmacro con-transaccion-postgres
-  "Recibe una llave indicando la base postgres en la que crear la transacción y uno o más vectores de operaciones SQL que ejecutar en la transacción"
+  "Recibe una llave indicando la base postgres en la que crear la transacción y uno o más vectores de operaciones SQL que ejecutar en la transacción.
+   Las operaciones deben ser independientes"
   [k & cuerpo]
-  `(jdbc/with-transaction [tx# (obtener-datasource :postgres ~k)]
-    (map (fn [v] (jdbc/execute! tx# v)) ~cuerpo)))
-
+  (let [tx-sym (gensym "tx")]
+    `(jdbc/with-transaction [~tx-sym (obtener-datasource :postgres ~k)]
+       ~@(for [exp cuerpo]
+           `(jdbc/execute! ~tx-sym ~exp)))))
+ 
 (def consulta-desal (obtener-conexion-postgres :desal))
 
 (def consulta-bases-auxiliares (obtener-conexion-postgres :bases_auxiliares))
@@ -63,8 +66,30 @@
 
 (def consulta-parametros (obtener-conexion-postgres :parametros))
 
+;(def transaccion-parametros (fn [& args] (apply #(con-transaccion-postgres :parametros %) args)))
+
 
 (comment
+  (require '[honey.sql :as sql])
+
+  (def r (consulta-parametros (sql/format {:select :prm_54
+                                           :from [:param]
+                                           :where [:= :key_param 1]})))
+  (:param/prm_54 (first r))
+ 
+  (transaccion-parametros 
+                          (sql/format {:update :param
+                                       :set {:prm_54 (inc (:param/prm_54 (first r)))}
+                                       :where [:= :key-param 1]}))
+  
+(jdbc/with-transaction [tx (obtener-datasource :postgres :parametros)]
+  (let [p (jdbc/execute! tx (sql/format {:select :prm_54
+                                        :from [:param]
+                                        :where [:= :key_param 1]}))]
+    (jdbc/execute! tx (sql/format {:update :param
+                                :set {:prm_54 (inc (:param/prm_54 (first p)))}
+                                :where [:= :key-param 1]}))))
+   
   (ns-unmap *ns* 'ejecutar-enunciado)
 
   (consulta-asistencial ["SELECT * FROM tbc_his_lectora WHERE hlec_protocolo = 109862"])
@@ -80,13 +105,15 @@
   (consulta-maestros ["SELECT * FROM tbc_analisis"])
 
   (consulta-parametros ["SELECT * FROM param"])
- 
-  (macroexpand-1 (con-transaccion-postgres :parametros ["SELECT * FROM param"] ["SELECT * FROM param"] ["SELECT * FROM param"]))
-   
-  (jdbc/with-transaction [tx (obtener-datasource :postgres :parametros)]
-    (apply (partial jdbc/execute! tx) ["SELECT * FROM param"] ["SELECT * FROM param"] ["SELECT * FROM param"]))
-    
-   
-  
-  :ref)
+
+  (macroexpand-1 '(con-transaccion-postgres :bases_auxiliares ["INSERT INTO tbl_eventlog_uti (historia_clinica, evento) 
+                                                       VALUES(1000, 'PRUEBA_TRANSACCION')"]
+                                            ["INSERT INTO tbl_eventlog_uco (historia_clinica, evento) 
+                                           VALUES(2000, 'PRUEBA_TRANSACCION')"]))
+
+
+
+
+  :ref
+  )
 
