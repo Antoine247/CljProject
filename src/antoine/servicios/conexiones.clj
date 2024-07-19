@@ -19,6 +19,7 @@
             (jdbc/execute! conn sentencia))
           (catch SQLException e (let [mensaje (.getMessage e)]
                                   (u/log ::excepcion-en-consulta-relativity
+                                         :sentencia sentencia
                                          :mensaje mensaje
                                          :fecha (LocalDateTime/now))))))
       (fn consulta [sentencia]
@@ -27,6 +28,7 @@
             (jdbc/execute-one! conn sentencia))
           (catch SQLException e (let [mensaje (.getMessage e)]
                                   (u/log ::excepcion-en-consulta-relativity
+                                         :sentencia sentencia
                                          :mensaje mensaje
                                          :fecha (LocalDateTime/now)))))))))
 
@@ -40,6 +42,7 @@
           (jdbc/execute! ds sentencia))
         (catch SQLException e (let [mensaje (.getMessage e)]
                                 (u/log ::excepcion-en-consulta-postgres
+                                       :sentencia sentencia
                                        :mensaje mensaje
                                        :fecha (LocalDateTime/now))))))))
   
