@@ -26,23 +26,23 @@
    hem -> Hemodinamia"
   [{:keys [aler ca csa sqca sqcsa sqia sqisa eap fa fasc fasm m hci anatpa cepa sepa rim imp prto hem]}]
   (cond
-    sqca (-> (e/inicializar-paciente :internado)
+    sqca (-> (e/inicializar-paciente :internado (or prto hem) true)
              (assoc :tipo-solicitud :completa-con-anestesia)
              (sq/insertar))
-    sqcsa (-> (e/inicializar-paciente :internado)
+    sqcsa (-> (e/inicializar-paciente :internado (or prto hem) false)
               (assoc :tipo-solicitud :completa-sin-anestesia)
               (sq/insertar))
-    sqia (-> (e/inicializar-paciente :internado)
+    sqia (-> (e/inicializar-paciente :internado (or prto hem) true)
              (assoc :tipo-solicitud :parcial-con-anestesia)
              (sq/insertar))
-    sqisa (-> (e/inicializar-paciente :internado)
+    sqisa (-> (e/inicializar-paciente :internado (or prto hem) false)
               (assoc :tipo-solicitud :parcial-sin-anestesia)
               (sq/insertar))
-    eap (-> (e/inicializar-paciente :internado)
+    eap (-> (e/inicializar-paciente :internado (or prto hem) true)
             (assoc :tipo-insercion :preanestesica :tipo-solicitud :completa-con-anestesia)
             (sq/insertar)
             (anes-int/insertar))
-    cepa (-> (e/inicializar-paciente :internado)
+    cepa (-> (e/inicializar-paciente :internado (or prto hem) true)
              (assoc :tipo-insercion :completa :tipo-solicitud :completa-con-anestesia) ;; Hay que agregar el registro en tbc_cirugint
              (sq/insertar)
              (anes-int/insertar))
@@ -72,7 +72,8 @@
    ; Revisar fecha en anestesia, cambiar por fecha actual
   (crear_protocolo_internado {:cepa true})
   (crear_protocolo_internado {:sqca true})
-    
+
+  (tap> (e/inicializar-paciente :internado nil true))
   
  (def l '(3221930M
           20240612

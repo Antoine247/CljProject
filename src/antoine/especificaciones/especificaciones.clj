@@ -6,7 +6,7 @@
 (spec/def :seguridad/alergia-anestesia (spec/int-in 1 3))
 (spec/def :evaluacion-medica/presion-arterial (spec/int-in 20 300))
 (spec/def :internado/es-parto (spec/or :some #{161 162 878}))
-
+ 
 (tests
  (spec/valid? :seguridad/material-entregable 4) := false
  (spec/valid? :seguridad/material-entregable 10) := false

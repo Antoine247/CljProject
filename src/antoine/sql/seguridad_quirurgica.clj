@@ -1,8 +1,7 @@
 (ns antoine.sql.seguridad-quirurgica
   "queries que se encargan de modificar la seguridad quirurgica ambulatoria"
   (:require [antoine.servicios.conexiones :refer [consulta-asistencial]]
-            [antoine.especificaciones.generadores :refer [generar-seguridad-quirurgica]]
-            [antoine.sql.numeradores :refer [obtener-nro-protocolo]]
+            [antoine.especificaciones.generadores :refer [generar-seguridad-quirurgica]] 
             [honey.sql :as sql]))
 
 (defn borrar
@@ -18,12 +17,12 @@
 
 (defn insertar
   "Recibe un mapa con HC y :tipo-solicitud (:completa-con-anestesia :completa-sin-anestesia :parcial-con-anestesia :parcial-sin-anestesia)
-   Devuelve un mapa `paciente` tal como el input añadiéndole el nro de protocolo"
-  [{:keys [tbc_admision_scroll/Adm_HistClin tbc_guardia/Guar_HistClinica tbc_guardia/Guar_HoraIngreso tbc_admision_scroll/Adm_HorIng tipo-solicitud] :as pac}] 
+   Devuelve un mapa `paciente` tal como el input"
+  [{:keys [tbc_admision_scroll/Adm_HistClin tbc_guardia/Guar_HistClinica tbc_guardia/Guar_HoraIngreso tbc_admision_scroll/Adm_HorIng tipo-solicitud tbc_cirugint/ciriprotocolo tbc_ciruguar/cirgprotocolo] :as pac}]
   (let [hc (or Adm_HistClin Guar_HistClinica)
         hora (or Adm_HorIng Guar_HoraIngreso)
         tipohc (if Adm_HistClin 0 1)
-        protocolo (obtener-nro-protocolo)
+        protocolo (or ciriprotocolo cirgprotocolo)
         valores (case tipo-solicitud
                   :completa-con-anestesia (concat [hc hc tipohc tipohc hora protocolo] (generar-seguridad-quirurgica :completa-con-anestesia))
                   :completa-sin-anestesia (concat [hc hc tipohc tipohc hora protocolo] (generar-seguridad-quirurgica :completa-sin-anestesia))
@@ -37,7 +36,7 @@
                                     :segtipohc1
                                     :seghoracarga
                                     :segprotocolo
-                                    :segfechacarga 
+                                    :segfechacarga
                                     :segcirculmate
                                     :segtipoadmin
                                     :seglegaadmin
@@ -109,7 +108,7 @@
                                     :segtipocirculcut]
                           :values [valores]})]
     (when (consulta-asistencial stmt)
-      (assoc pac :protocolo protocolo))))
+      pac)))
 
 
 (comment 

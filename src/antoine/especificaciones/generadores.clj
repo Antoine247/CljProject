@@ -10,7 +10,8 @@
                                                                 generar-pulso
                                                                 presion-min-max]]
             [clojure.spec.gen.alpha :as gen]
-            [clojure.spec.alpha :as spec]))
+            [clojure.spec.alpha :as spec]
+            [antoine.sql.parametros :refer [obtiene-nro-protocolo-ambulatorio obtiene-nro-protocolo-internado]]))
 
 (defmulti generar-seguridad-quirurgica (fn [_] (identity _)))
 
@@ -643,52 +644,52 @@
 
 (defn generar-protocolo-internado-iniciado
   []
-  [;:ciriiepartero
-   ;:ciriieneonato
-   ;:ciripatologia
-   ;:cirileghemote
-   ;:cirilegmonito
-   ;:cirilegperfus
-   ;:cirilegconsenti
-   ;:ciriieconsenti
-   ;:ciriresponde
-   ;:ciricodnome
-   ;:ciritiponome
-   ;:ciriieciru
-   ;:cirilegciru
-   ;:cirinroquirofa
-   ;:cirifechafinal
-   ;:cirihorafinal
-   ;:ciripinzasinicio
-   ;:cirifechainicio
-   ;:cirihorainicio
-   ;:ciriestado
-   ;:ciriconsenti
-   ;:ciriserieprot
-   ;:cirimarcaprot
-   ;:cirifechabanio
-   ;:cirihorabanio
-   ;:cirifecharasura
-   ;:cirihorarasura
-   ;:ciriconquerasura
-   ;:cirinroquirofa
-   ;:cirinrosolpatol
-   ;:ciriintensi
-   ;:cirihorasint
-   ;:ciricantint
-   ;:ciriusoo2
-   0 ;:ciriobsttipo 
-   ;:ciriobstgesta
-   ;:cirilegatecnico
-   ;:ciritipotecnico
-   ;:ciripinzasinicio
-   ;:ciripinzasfinal
-   ;:cirigasasfinal
-   ;:ciripasorend
-   ;:ciriusolaserargon
-   ;:ciriusomicroscopio
-   ;:ciriusolaparascopio
-   ])
+  (let [protocolo (-> (obtiene-nro-protocolo-internado) first :param/prm_54)] 
+    [protocolo                                               ;:ciriprotocolo
+     0                                                       ;:ciriiepartero
+     0                                                       ;:ciriieneonato
+     0                                                       ;:ciripatologia
+     ""                                                      ;:cirileghemote
+     ""                                                      ;:cirilegmonito
+     ""                                                      ;:cirilegperfus
+     0                                                       ;:cirilegconsenti
+     0                                                       ;:ciriieconsenti
+     0                                                       ;:ciriresponde
+     0                                                       ;:ciricodnome
+     0                                                       ;:ciritiponome
+     0                                                       ;:ciriieciru
+     0                                                       ;:cirilegciru
+     0                                                       ;:cirinroquirofa
+     0                                                       ;:cirifechafinal
+     0                                                       ;:cirihorafinal 
+     0                                                       ;:cirifechainicio
+     0                                                       ;:cirihorainicio
+     0                                                       ;:ciriestado
+     ""                                                      ;:ciriconsenti
+     ""                                                      ;:ciriserieprot
+     ""                                                      ;:cirimarcaprot
+     0                                                       ;:cirifechabanio
+     0                                                       ;:cirihorabanio
+     0                                                       ;:cirifecharasura
+     0                                                       ;:cirihorarasura
+     0                                                       ;:ciriconquerasura
+     0                                                       ;:cirinrosolpatol
+     0                                                       ;:ciriintensi
+     0                                                       ;:cirihorasint
+     0                                                       ;:ciricantint
+     0                                                       ;:ciriusoo2 
+     0                                                       ;:ciriobsttipo 
+     0                                                       ;:ciriobstgesta
+     0                                                       ;:cirilegatecnico
+     0                                                       ;:ciritipotecnico
+     0                                                       ;:ciripinzasinicio
+     0                                                       ;:ciripinzasfinal
+     0                                                       ;:cirigasasfinal
+     0                                                       ;:ciripasorend
+     0                                                       ;:ciriusolaserargon
+     0                                                       ;:ciriusomicroscopio
+     0                                                       ;:ciriusolaparascopio
+                    ]))
 
 (defn generar-protocolo-internado
   [] 
@@ -697,8 +698,10 @@
         fecha-inicio (fecha-actual)
         fecha-fin fecha-inicio
         pinzas-ini (rand-nth (range 1 11))
-        pinzas-fin pinzas-ini] 
-    [0                                                                     ;:ciriiepartero
+        pinzas-fin pinzas-ini 
+        protocolo (-> (obtiene-nro-protocolo-internado) first :param/prm_54)] 
+    [protocolo                                                             ;:ciriprotocolo
+     0                                                                     ;:ciriiepartero
      0                                                                     ;:ciriieneonato
      0                                                                     ;:ciripatologia
      (generar-nombre)                                                      ;:cirileghemote
@@ -745,7 +748,9 @@
 
 (defn generar-protocolo-internado-con-implantes
   []
-  [;:ciriiepartero
+  (let [protocolo (-> (obtiene-nro-protocolo-internado) first :param/prm_54)] 
+    [protocolo ;:ciriprotocolo
+      ;:ciriiepartero
    ;:ciriieneonato
    ;:ciripatologia
    ;:cirileghemote
@@ -761,10 +766,9 @@
    ;:cirinroquirofa
    ;:cirifechafinal
    ;:cirihorafinal
-   ;:ciripinzasinicio
    ;:cirifechainicio
    ;:cirihorainicio
-   1;:ciriestado
+                                                                               1;:ciriestado
    ;:ciriconsenti
    ;:ciriserieprot
    ;:cirimarcaprot
@@ -779,7 +783,7 @@
    ;:cirihorasint
    ;:ciricantint
    ;:ciriusoo2
-   0 ;:ciriobsttipo 
+                                                                               0 ;:ciriobsttipo 
    ;:ciriobstgesta
    ;:cirilegatecnico
    ;:ciritipotecnico
@@ -790,11 +794,13 @@
    ;:ciriusolaserargon
    ;:ciriusomicroscopio
    ;:ciriusolaparascopio
-   ])
+                                                                               ]))
 
 (defn generar-protocolo-internado-extraccion-implantes
   []
-  [;:ciriiepartero
+  (let [protocolo (-> (obtiene-nro-protocolo-internado) first :param/prm_54)] 
+    [protocolo                                                 ;: ciriprotocolo
+      ;:ciriiepartero
    ;:ciriieneonato
    ;:ciripatologia
    ;:cirileghemote
@@ -810,10 +816,9 @@
    ;:cirinroquirofa
    ;:cirifechafinal
    ;:cirihorafinal
-   ;:ciripinzasinicio
    ;:cirifechainicio
    ;:cirihorainicio
-   1;:ciriestado
+                                                                               1;:ciriestado
    ;:ciriconsenti
    ;:ciriserieprot
    ;:cirimarcaprot
@@ -828,7 +833,7 @@
    ;:cirihorasint
    ;:ciricantint
    ;:ciriusoo2
-   0 ;:ciriobsttipo 
+                                                                               0 ;:ciriobsttipo 
    ;:ciriobstgesta
    ;:cirilegatecnico
    ;:ciritipotecnico
@@ -839,11 +844,13 @@
    ;:ciriusolaserargon
    ;:ciriusomicroscopio
    ;:ciriusolaparascopio
-   ])
+                                                                               ]))
 
 (defn generar-protocolo-internado-anatomia-patologica
   []
-  [;:ciriiepartero
+  (let [protocolo (-> (obtiene-nro-protocolo-internado) first :param/prm_54)] 
+    [protocolo ;:ciriprotocolo
+      ;:ciriiepartero
    ;:ciriieneonato
    ;:ciripatologia
    ;:cirileghemote
@@ -857,12 +864,11 @@
    ;:ciriieciru
    ;:cirilegciru
    ;:cirinroquirofa
-   (fecha-actual);:cirifechafinal
-   (plus-n-mins 120);:cirihorafinal
-   ;:ciripinzasinicio
-   (fecha-actual);:cirifechainicio
-   (hora-actual);:cirihorainicio
-   1;:ciriestado
+                                                                               (fecha-actual);:cirifechafinal
+                                                                               (plus-n-mins 120);:cirihorafinal 
+                                                                               (fecha-actual);:cirifechainicio
+                                                                               (hora-actual);:cirihorainicio
+                                                                               1;:ciriestado
    ;:ciriconsenti
    ;:ciriserieprot
    ;:cirimarcaprot
@@ -877,7 +883,7 @@
    ;:cirihorasint
    ;:ciricantint
    ;:ciriusoo2
-   0 ;:ciriobsttipo 
+                                                                               0 ;:ciriobsttipo 
    ;:ciriobstgesta
    ;:cirilegatecnico
    ;:ciritipotecnico
@@ -888,7 +894,7 @@
    ;:ciriusolaserargon
    ;:ciriusomicroscopio
    ;:ciriusolaparascopio
-   ])
+                                                                               ]))
  
 (comment
   (gen/generate (spec/gen :seguridad/material-entregable))
@@ -902,5 +908,53 @@
   (count (generar-seguridad-quirurgica :completa-con-anestesia))
   (count (generar-seguridad-quirurgica :parcial-con-anestesia))
   
+  (count (generar-protocolo-internado-iniciado))
+
 (generar-presiones-arteriales)
+  
+  (sort (list :ciriprotocolo 
+                   :ciriiepartero 
+                   :ciriieneonato 
+                   :ciripatologia 
+                   :cirileghemote 
+                   :cirilegmonito 
+                   :cirilegperfus 
+                   :cirilegconsenti 
+                   :ciriieconsenti 
+                   :ciriresponde 
+                   :ciricodnome 
+                   :ciritiponome 
+                   :ciriieciru 
+                   :cirilegciru 
+                   :cirinroquirofa 
+                   :cirifechafinal 
+                   :cirihorafinal 
+                   :ciripinzasinicio
+                   :cirifechainicio 
+                   :cirihorainicio 
+                   :ciriestado 
+                   :ciriconsenti 
+                   :ciriserieprot 
+                   :cirimarcaprot 
+                   :cirifechabanio 
+                   :cirihorabanio 
+                   :cirifecharasura 
+                   :cirihorarasura 
+                   :ciriconquerasura
+                   :cirinrosolpatol 
+                   :ciriintensi 
+                   :cirihorasint 
+                   :ciricantint 
+                   :ciriusoo2 
+                   :ciriobsttipo 
+                   :ciriobstgesta 
+                   :cirilegatecnico 
+                   :ciritipotecnico 
+                   :ciripinzasinicio
+                   :ciripinzasfinal 
+                   :cirigasasfinal 
+                   :ciripasorend 
+                   :ciriusolaserargo
+                   :ciriusomicroscop
+                   :ciriusolaparasco))
   )

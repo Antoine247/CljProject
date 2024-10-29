@@ -9,13 +9,12 @@
                                                           generar-protocolo-internado-anatomia-patologica]]
             [antoine.especificaciones.generadores-utils :refer [legajo-sin-digito-verificador
                                                                 legajo-medico
-                                                                generar-intervencion]]
-            [antoine.sql.numeradores :as numeradores]))
+                                                                generar-intervencion]]))
 
 (defn insertar
   "Las opciones serían :hemodinamia, :parto o nil, el status :inicializada :completa :completa-con-implantes :completa-con-extraccion-implante 
    :completa-con-anatomia-patologica y anestesia? un booleano"
-  [{:keys [tbc_admision_scroll/Adm_HistClin tbc_admision_scroll/Adm_FecIng tbc_admision_scroll/Adm_HorIng protocolo opciones status anestesia?] :as pac}]
+  [{:keys [tbc_admision_scroll/Adm_HistClin tbc_admision_scroll/Adm_FecIng tbc_admision_scroll/Adm_HorIng opciones status anestesia?] :as pac}]
   (let [{:keys [tipointerven parto_ intervencion neonatologo partero]} (cond
                                                                  (= opciones :hemodinamia) {:tipointerven 2
                                                                                             :intervencion (generar-intervencion)
@@ -51,9 +50,9 @@
                   intervencion 
                   partero
                   neonatologo 
-                  parto_
-                  protocolo]
-                 (fn-generacion)) 
+                  parto_]
+                 (fn-generacion))
+        nro_prot (nth valores 11)
         consulta (sql/format {:insert-into :tbc_cirugint
                               :columns [:cirihistcl
                                         :cirifechacarga
@@ -68,7 +67,7 @@
                                         :ciriparto
                                         :ciriprotocolo
                                         :ciriiepartero
-                                        :ciriieneonato 
+                                        :ciriieneonato
                                         :ciripatologia
                                         :cirileghemote
                                         :cirilegmonito
@@ -82,7 +81,7 @@
                                         :cirilegciru
                                         :cirinroquirofa
                                         :cirifechafinal
-                                        :cirihorafinal 
+                                        :cirihorafinal
                                         :cirifechainicio
                                         :cirihorainicio
                                         :ciriestado
@@ -111,134 +110,131 @@
                                         :ciriusomicroscopio
                                         :ciriusolaparascopio]
                               :values [valores]})]
-   (when (and (consulta-asistencial consulta) (anatpa/insertar pac))
-     pac)))
+   (when (consulta-asistencial consulta) #_(and (consulta-asistencial consulta) (anatpa/insertar pac))
+     (assoc pac :tbc_cirugint/ciriprotocolo nro_prot))))
  
 (comment
-  
-  (insertar {:tbc_admision_scroll/Adm_HistClin 3223490
-             :tbc_admision_scroll/Adm_FecIng 20240618
-             :tbc_admision_scroll/Adm_HorIng 1654
-             :opciones nil 
-             :status :completa 
-             :anestesia? false})
-  
-  (def campos '(CiriHistCl
-                CiriFechaCarga
-                CiriHoraCarga
-                CiriTipoNome
-                CiriCodNome
-                CiriProtocolo
-                CiriFechaCarga1
-                CiriHoraCarga1
-                CiriFechaInicio
-                CiriHoraInicio
-                CiriFechaFinal
-                CiriHoraFinal
-                CiriLegCiru
-                CiriIeCiru
-                CiriInterven
-                CiriAnestesia
-                CiriPatologia
-                CiriEstado
-                CiriConsenti
-                CiriSerieProt
-                CiriLegPartero
-                CiriIePartero
-                CiriLegNeonato
-                CiriIeNeonato
-                CiriLegHemote
-                CiriLegMonito
-                CiriMarcaProt
-                CiriLegPerfus
-                CiriLegConsenti
-                CiriIeConsenti
-                CiriResponde
-                CiriFechaBanio
-                CiriHoraBanio
-                CiriFechaRasura
-                CiriHoraRasura
-                CiriConQueRasura
-                CiriNroQuirofa
-                CiriNrosolPatol
-                CiriIntensi
-                CiriHorasInt
-                CiriCantInt
-                CiriUsoO2
-                CiriParto
-                CiriObstTipo
-                CiriObstGesta
-                CiriLegaTecnico
-                CiriTipoTecnico
-                CiriPinzasInicio
-                CiriPinzasFinal
-                CiriGasasFinal
-                CiriTipoInterven
-                CiriPasoRend
-                CiriUsoLaserArgon
-                CiriUsoMicroscopio
-                CiriUsoLaparascopio))
+
+ (tap> (insertar {:tbc_admision_scroll/Adm_HistClin 3261570M
+                  :tbc_admision_scroll/Adm_FecIng 20241016
+                  :tbc_admision_scroll/Adm_HorIng 1848
+                  :opciones nil
+                  :status :inicializada
+                  :anestesia? true}))
+
+  (def campos '(cirihistcl, cirifechacarga, cirihoracarga, cirifechacarga1, cirihoracarga1, ciritipointerven, cirianestesia, ciriinterven, cirilegpartero, cirilegneonato, ciriparto, ciriprotocolo, ciriiepartero, ciriieneonato, ciripatologia, cirileghemote, cirilegmonito, cirilegperfus, cirilegconsenti, ciriieconsenti, ciriresponde, ciricodnome, ciritiponome, ciriieciru, cirilegciru, cirinroquirofa, cirifechafinal, cirihorafinal, cirifechainicio, cirihorainicio, ciriestado, ciriconsenti, ciriserieprot, cirimarcaprot, cirifechabanio, cirihorabanio, cirifecharasura, cirihorarasura, ciriconquerasura, cirinrosolpatol, ciriintensi, cirihorasint, ciricantint, ciriusoo2, ciriobsttipo, ciriobstgesta, cirilegatecnico, ciritipotecnico, ciripinzasinicio, ciripinzasfinal, cirigasasfinal, ciripasorend, ciriusolaserargon, ciriusomicroscopio, ciriusolaparascopio))
   (count campos)
 
-  (def columnas [:cirihistcl
-                 :cirifechacarga
-                 :cirihoracarga
-                 :cirifechacarga1
-                 :cirihoracarga1
-                 :ciritipointerven
-                 :cirianestesia
-                 :ciriinterven
-                 :cirilegpartero
-                 :cirilegneonato
-                 :ciriparto
-                 :ciriiepartero
-                 :ciriieneonato
-                 :ciripatologia
-                 :cirileghemote
-                 :cirilegmonito
-                 :cirilegperfus
-                 :cirilegconsenti
-                 :ciriieconsenti
-                 :ciriresponde
-                 :ciricodnome
-                 :ciritiponome
-                 :ciriieciru
-                 :cirilegciru
-                 :cirinroquirofa
-                 :cirifechafinal
-                 :cirihorafinal
-                 :cirifechainicio
-                 :cirihorainicio
-                 :ciriestado
-                 :ciriconsenti
-                 :ciriserieprot
-                 :cirimarcaprot
-                 :cirifechabanio
-                 :cirihorabanio
-                 :cirifecharasura
-                 :cirihorarasura
-                 :ciriconquerasura
-                 :cirinrosolpatol
-                 :ciriintensi
-                 :cirihorasint
-                 :ciricantint
-                 :ciriusoo2
-                 :ciriobsttipo ;; siempre 0
-                 :ciriobstgesta
-                 :cirilegatecnico
-                 :ciritipotecnico
-                 :ciripinzasinicio
-                 :ciripinzasfinal
-                 :cirigasasfinal
-                 :ciripasorend
-                 :ciriusolaserargon
-                 :ciriusomicroscopio
-                 :ciriusolaparascopio])
-  (count columnas)
+  (def valor [3261570M
+              20241016
+              1848
+              20241016
+              1848
+              1
+              1
+              1028
+              0
+              0
+              0
+              500524M
+              0
+              0
+              0
+              ""
+              ""
+              ""
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              ""
+              ""
+              ""
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0
+              0])
+  (count valor)
 
- (tap> 
-  (clojure.pprint/print-table (mapv merge 
-                                    (mapv #(assoc {} :campos %) (sort campos))  
-                                    (mapv #(assoc {} :columnas %) (sort columnas))))) 
+  (tap>
+   (clojure.pprint/print-table (mapv merge
+                                     (mapv #(assoc {} :campos %) (sort campos))
+                                     (mapv #(assoc {} :columnas %) (sort valor)))))
   
-  :rfc)
+  (tap> (zipmap campos valor))
+
+  (count (list
+          :ciriprotocolo
+          :ciriiepartero
+          :ciriieneonato
+          :ciripatologia
+          :cirileghemote
+          :cirilegmonito
+          :cirilegperfus
+          :cirilegconsenti
+          :ciriieconsenti
+          :ciriresponde
+          :ciricodnome
+          :ciritiponome
+          :ciriieciru
+          :cirilegciru
+          :cirinroquirofa
+          :cirifechafinal
+          :cirihorafinal
+          :cirifechainicio
+          :cirihorainicio
+          :ciriestado
+          :ciriconsenti
+          :ciriserieprot
+          :cirimarcaprot
+          :cirifechabanio
+          :cirihorabanio
+          :cirifecharasura
+          :cirihorarasura
+          :ciriconquerasura
+          :cirinrosolpatol
+          :ciriintensi
+          :cirihorasint
+          :ciricantint
+          :ciriusoo2
+          :ciriobsttipo 
+          :ciriobstgesta
+          :cirilegatecnico
+          :ciritipotecnico
+          :ciripinzasinicio
+          :ciripinzasfinal
+          :cirigasasfinal
+          :ciripasorend
+          :ciriusolaserargon
+          :ciriusomicroscopio
+          :ciriusolaparascopio))
+
+  :rfc
+  )

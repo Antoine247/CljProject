@@ -6,15 +6,16 @@
             [antoine.sql.his-lectora :as lectora]
             [antoine.sql.anestesia-internado :as anes]
             [antoine.especificaciones.generadores-utils :refer [generar-intervencion]]
-            [antoine.utils.utils :as utils]))
+            [antoine.utils.utils :as utils]
+            [antoine.sql.cirugia-internado :as internado-cir]))
  
 (defn inicializar-paciente
   "Recibe una llave, :ambulatorio ó :internado"
-  [tipo_paciente]
+  [tipo_paciente hemodinamia-o-parto anestesia?]
   (if (= tipo_paciente :internado)
     (let [paciente (internado/paciente-internado-aleatorio)] 
       ((juxt seguridad/borrar alerta/borrar lectora/borrar anes/borrar) paciente)
-      paciente)
+      (internado-cir/insertar (assoc paciente :opciones hemodinamia-o-parto :status :inicializada :anestesia? anestesia?)))
     (let [paciente (ambulatorio/paciente-ambulatorio-aleatorio)
           fecha (utils/fecha-actual)
           hora (utils/hora-actual)
@@ -41,6 +42,6 @@
 (comment
     
   (inicializar-paciente :ambulatorio)
-  (inicializar-paciente :internado)
+  (inicializar-paciente :internado nil nil)
    
   )
