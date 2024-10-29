@@ -1,13 +1,17 @@
 (ns antoine.sql.seguridad-quirurgica
   "queries que se encargan de modificar la seguridad quirurgica ambulatoria"
   (:require [antoine.servicios.conexiones :refer [consulta-asistencial]]
-            [antoine.especificaciones.generadores :refer [generar-seguridad-quirurgica]] 
+            [antoine.especificaciones.generador-seguridadquirurgica :as g] 
             [honey.sql :as sql]))
 
 (defn borrar
   "Borra la seguridad quirurgica" 
-  [{:keys [tbc_guardia/Guar_HistClinica tbc_guardia/Guar_FechaIngreso tbc_guardia/Guar_HoraIngreso
-           tbc_admision_scroll/Adm_HistClin tbc_admision_scroll/Adm_FecIng tbc_admision_scroll/Adm_HorIng]}] 
+  [{:keys [tbc_guardia/Guar_HistClinica 
+           tbc_guardia/Guar_FechaIngreso 
+           tbc_guardia/Guar_HoraIngreso
+           tbc_admision_scroll/Adm_HistClin 
+           tbc_admision_scroll/Adm_FecIng 
+           tbc_admision_scroll/Adm_HorIng]}] 
   (let [query (sql/format {:delete-from :tbc_seguqui_new
                            :where [:and
                                    [:= :tbc_seguqui_new.SegHistClinica (or Guar_HistClinica Adm_HistClin)]
@@ -18,16 +22,22 @@
 (defn insertar
   "Recibe un mapa con HC y :tipo-solicitud (:completa-con-anestesia :completa-sin-anestesia :parcial-con-anestesia :parcial-sin-anestesia)
    Devuelve un mapa `paciente` tal como el input"
-  [{:keys [tbc_admision_scroll/Adm_HistClin tbc_guardia/Guar_HistClinica tbc_guardia/Guar_HoraIngreso tbc_admision_scroll/Adm_HorIng tipo-solicitud tbc_cirugint/ciriprotocolo tbc_ciruguar/cirgprotocolo] :as pac}]
+  [{:keys [tbc_admision_scroll/Adm_HistClin 
+           tbc_guardia/Guar_HistClinica 
+           tbc_guardia/Guar_HoraIngreso 
+           tbc_admision_scroll/Adm_HorIng 
+           tipo-solicitud 
+           tbc_cirugint/ciriprotocolo 
+           tbc_ciruguar/cirgprotocolo] :as pac}]
   (let [hc (or Adm_HistClin Guar_HistClinica)
         hora (or Adm_HorIng Guar_HoraIngreso)
         tipohc (if Adm_HistClin 0 1)
         protocolo (or ciriprotocolo cirgprotocolo)
         valores (case tipo-solicitud
-                  :completa-con-anestesia (concat [hc hc tipohc tipohc hora protocolo] (generar-seguridad-quirurgica :completa-con-anestesia))
-                  :completa-sin-anestesia (concat [hc hc tipohc tipohc hora protocolo] (generar-seguridad-quirurgica :completa-sin-anestesia))
-                  :parcial-con-anestesia (concat [hc hc tipohc tipohc hora protocolo] (generar-seguridad-quirurgica :parcial-con-anestesia))
-                  :parcial-sin-anestesia (concat [hc hc tipohc tipohc hora protocolo] (generar-seguridad-quirurgica :parcial-sin-anestesia))
+                  :completa-con-anestesia (concat [hc hc tipohc tipohc hora protocolo] (g/generar-seguridad-quirurgica :completa-con-anestesia))
+                  :completa-sin-anestesia (concat [hc hc tipohc tipohc hora protocolo] (g/generar-seguridad-quirurgica :completa-sin-anestesia))
+                  :parcial-con-anestesia (concat [hc hc tipohc tipohc hora protocolo] (g/generar-seguridad-quirurgica :parcial-con-anestesia))
+                  :parcial-sin-anestesia (concat [hc hc tipohc tipohc hora protocolo] (g/generar-seguridad-quirurgica :parcial-sin-anestesia))
                   (throw (IllegalArgumentException. "Opción inválida para generación de valores para seguridad quirúrgica")))
         stmt (sql/format {:insert-into :tbc_seguqui_new
                           :columns [:seghistclinica
@@ -123,5 +133,5 @@
   (insertar pac2)
   (insertar pac3) 
   (insertar pac4)
-  
+  (ns-unalias *ns* 'generar-seguridad-quirurgica)
   )

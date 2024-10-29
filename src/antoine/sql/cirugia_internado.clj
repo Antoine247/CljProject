@@ -2,11 +2,11 @@
   (:require [antoine.sql.anatomia-patologica :as anatpa]
             [antoine.servicios.conexiones :refer [consulta-asistencial]]
             [honey.sql :as sql]
-            [antoine.especificaciones.generadores :refer [generar-protocolo-internado-iniciado
-                                                          generar-protocolo-internado
-                                                          generar-protocolo-internado-con-implantes
-                                                          generar-protocolo-internado-extraccion-implantes
-                                                          generar-protocolo-internado-anatomia-patologica]]
+            [antoine.especificaciones.generador-protocolo-internado :refer [generar-protocolo-internado-iniciado
+                                                                            generar-protocolo-internado
+                                                                            generar-protocolo-internado-con-implantes
+                                                                            generar-protocolo-internado-extraccion-implantes
+                                                                            generar-protocolo-internado-anatomia-patologica]]
             [antoine.especificaciones.generadores-utils :refer [legajo-sin-digito-verificador
                                                                 legajo-medico
                                                                 generar-intervencion]]))
@@ -16,21 +16,21 @@
    :completa-con-anatomia-patologica y anestesia? un booleano"
   [{:keys [tbc_admision_scroll/Adm_HistClin tbc_admision_scroll/Adm_FecIng tbc_admision_scroll/Adm_HorIng opciones status anestesia?] :as pac}]
   (let [{:keys [tipointerven parto_ intervencion neonatologo partero]} (cond
-                                                                 (= opciones :hemodinamia) {:tipointerven 2
-                                                                                            :intervencion (generar-intervencion)
-                                                                                            :neonatologo 0
-                                                                                            :parto_ 0
-                                                                                            :partero 0}
-                                                                 (= opciones :parto) {:tipointerven 0
-                                                                                      :intervencion (rand-nth [161 162 878])
-                                                                                      :neonatologo (legajo-sin-digito-verificador legajo-medico)
-                                                                                      :parto_ 1
-                                                                                      :partero (legajo-sin-digito-verificador legajo-medico)}
-                                                                 :else {:tipointerven 1
-                                                                        :intervencion (generar-intervencion)
-                                                                        :neonatologo 0
-                                                                        :parto_ 0
-                                                                        :partero 0})
+                                                                         (= opciones :hemodinamia) {:tipointerven 2
+                                                                                                    :intervencion (generar-intervencion)
+                                                                                                    :neonatologo 0
+                                                                                                    :parto_ 0
+                                                                                                    :partero 0}
+                                                                         (= opciones :parto) {:tipointerven 0
+                                                                                              :intervencion (rand-nth [161 162 878])
+                                                                                              :neonatologo (legajo-sin-digito-verificador legajo-medico)
+                                                                                              :parto_ 1
+                                                                                              :partero (legajo-sin-digito-verificador legajo-medico)}
+                                                                         :else {:tipointerven 1
+                                                                                :intervencion (generar-intervencion)
+                                                                                :neonatologo 0
+                                                                                :parto_ 0
+                                                                                :partero 0})
         anestesia (if anestesia? 1 0)
         fn-generacion (cond
                         (= status :inicializada) generar-protocolo-internado-iniciado
@@ -38,7 +38,7 @@
                         (= status :completa-con-implantes) generar-protocolo-internado-con-implantes
                         (= status :completa-con-extraccion-implante) generar-protocolo-internado-extraccion-implantes
                         (= status :completa-con-anatomia-patologica) generar-protocolo-internado-anatomia-patologica
-                        :else (throw (IllegalArgumentException. "Opción inválida"))) 
+                        :else (throw (IllegalArgumentException. "Opción inválida")))
         valores (concat
                  [Adm_HistClin
                   Adm_FecIng
@@ -47,9 +47,9 @@
                   Adm_HorIng
                   tipointerven
                   anestesia
-                  intervencion 
+                  intervencion
                   partero
-                  neonatologo 
+                  neonatologo
                   parto_]
                  (fn-generacion))
         nro_prot (nth valores 11)
@@ -110,8 +110,8 @@
                                         :ciriusomicroscopio
                                         :ciriusolaparascopio]
                               :values [valores]})]
-   (when (consulta-asistencial consulta) #_(and (consulta-asistencial consulta) (anatpa/insertar pac))
-     (assoc pac :tbc_cirugint/ciriprotocolo nro_prot))))
+    (when (consulta-asistencial consulta) #_(and (consulta-asistencial consulta) (anatpa/insertar pac))
+          (assoc pac :tbc_cirugint/ciriprotocolo nro_prot))))
  
 (comment
 

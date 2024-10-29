@@ -1,6 +1,6 @@
 (ns antoine.sql.anestesia-internado
   (:require [antoine.servicios.conexiones :refer [consulta-asistencial]]
-            [antoine.especificaciones.generadores :refer [generar-evaluacion-anestesica-completa generar-evaluacion-preanestesica]]
+            [antoine.especificaciones.generador-anestesia :refer [generar-evaluacion-anestesica-completa generar-evaluacion-preanestesica]]
             [honey.sql :as sql]
             [antoine.utils.utils :as utils]))
 
